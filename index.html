@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Miau Presentes - Home</title>
+  <link rel="stylesheet" href="css/style.css">
+  <!-- 1. Script principal do header carregado aqui -->
+  <script src="js/load-header.js" defer></script>
+  <script src="js/cart.js" defer></script>
+</head>
+<body>
+
+  <!-- 2. O Header será carregado aqui -->
+  <div id="header-placeholder"></div>
+
+  <!-- O HTML estático do header foi REMOVIDO daqui -->
+
+  <!-- CARROSSEL DE PRODUTOS EM DESTAQUE -->
+    <section class="carousel-section fade-in">
+      <div class="carousel">
+        <div class="carousel-container" id="carousel-container">
+          <!-- Produto 1 -->
+          <div class="carousel-item" data-id="1" data-name="Caneca Personalizada" data-price="35.00" data-image="imagens/caneca1.jpg">
+            <img src="imagens/caneca1.jpg" alt="Caneca personalizada" />
+            <h4>Canecas Personalizadas</h4>
+            <p>Monte sua caneca com foto, frase ou arte exclusiva.</p>
+            <strong>R$ 35,00</strong>
+            <div class="carousel-actions">
+              <button class="add-to-cart btn" data-name="Caneca Personalizada" data-price="35.00" data-image="imagens/caneca1.jpg">🛒 Adicionar ao Carrinho</button>
+              <a href="canecas.html" class="btn">Personalizar</a>
+            </div>
+          </div>
+
+          <!-- Produto 2 -->
+          <div class="carousel-item" data-id="2" data-name="Caderno Criativo" data-price="25.00" data-image="imagens/caderno1.jpg">
+            <img src="imagens/caderno1.jpg" alt="Caderno Criativo" />
+            <h4>Cadernos</h4>
+            <p>Cadernos coloridos para estudo ou anotações.</p>
+            <strong>R$ 25,00</strong>
+            <div class="carousel-actions">
+              <button class="add-to-cart btn" data-name="Caderno Criativo" data-price="25.00" data-image="imagens/caderno1.jpg">🛒 Adicionar ao Carrinho</button>
+              <a href="produtos.html" class="btn">Ver Mais</a>
+            </div>
+          </div>
+
+          <!-- Produto 3 -->
+          <div class="carousel-item" data-id="3" data-name="Kit Presente" data-price="70.00" data-image="imagens/kit1.jpg">
+            <img src="imagens/kit1.jpg" alt="Kit Presente" />
+            <h4>Kits para Presente</h4>
+            <p>Surpreenda quem você ama com nossos kits exclusivos.</p>
+            <strong>R$ 70,00</strong>
+            <div class="carousel-actions">
+              <button class="add-to-cart btn" data-name="Kit Presente" data-price="70.00" data-image="imagens/kit1.jpg">🛒 Adicionar ao Carrinho</button>
+              <a href="produtos.html" class="btn">Ver Mais</a>
+            </div>
+          </div>
+        </div>
+        <button class="carousel-btn left" id="prev">&#10094;</button>
+        <button class="carousel-btn right" id="next">&#10095;</button>
+      </div>
+    </section>
+
+    <!-- PRODUTOS DINÂMICOS -->
+    <section class="dynamic-products fade-in">
+      <h2>🛍️ Produtos da Loja</h2>
+      <div class="product-list" id="dynamic-product-list"></div>
+    </section>
+  </main>
+
+
+<footer class="expanded-footer">
+  <div class="footer-container">
+    
+    <!-- Coluna 1: Informações da Loja -->
+    <div class="footer-column">
+      <h3>Miau Presentes</h3>
+      <p>Sua loja de presentes criativos e personalizados.</p>
+      <p>&copy; 2025 Miau Presentes - Todos os direitos reservados</p>
+    </div>
+
+    <!-- Coluna 2: Links Úteis -->
+    <div class="footer-column">
+      <h3>Links Úteis</h3>
+      <ul>
+        <li><a href="index.html">Página Inicial</a></li>
+        <li><a href="produtos.html">Produtos</a></li>
+        <li><a href="sobre.html">Sobre Nós</a></li>
+        <li><a href="contato.html">Contato</a></li>
+      </ul>
+    </div>
+
+    <!-- Coluna 3: Contato -->
+    <div class="footer-column">
+      <h3>Fale Conosco</h3>
+      <p>E-mail: <a href="mailto:contato@miau.com">contato@miau.com</a></p>
+      <p>Telefone: <a href="https://wa.me/553599879068">(35) 9987-9068</a></p>
+      <p>Endereço:Praça Barão de Cambui, x - Cassia MG</p>
+    </div>
+
+    <!-- Coluna 4: Redes Sociais -->
+    <div class="footer-column">
+      <h3>Redes Sociais</h3>
+      <div class="social-links">
+        <a href="https://instagram.com/miau.cassia" target="_blank">Instagram 📸</a>
+        <a href="#" target="_blank">Facebook 👍</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+  <a href="https://wa.me/5535992004450?text=Olá! Gostaria de ver mais produtos." class="whatsapp-float" target="_blank">💬</a>
+
+  <!-- SCRIPTS -->
+  <script src="js/carrosel.js"></script>
+  <script src="js/animation.js"></script>
+  <script src="js/estoque.js"></script>
+  
+  <!-- Os scripts do header (header.js, menu.js, search.js) foram REMOVIDOS daqui -->
+</body>
+</html>

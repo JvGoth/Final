@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Canecas Personalizadas - Miau Presentes</title>
+  <link rel="stylesheet" href="css/style.css">
+  <!-- 1. Script principal do header carregado aqui -->
+  <script src="js/load-header.js" defer></script>
+  <script src="js/cart.js" defer></script>
+</head>
+<body>
+
+  <!-- 2. O Header será carregado aqui -->
+  <div id="header-placeholder"></div>
+  
+  <!-- O HTML estático do header foi REMOVIDO daqui -->
+
+  <!-- Seção de Canecas -->
+    <main>
+    <section>
+      <h2 class="fade-in">Canecas Personalizadas</h2>
+      <p class="fade-in">Monte sua caneca com fotos, frases ou artes exclusivas. Um presente único para qualquer ocasião!</p>
+
+      <div class="product-list">
+        <div class="product-card fade-in">
+          <img src="imagens/caneca1.jpg" alt="Caneca com Nome">
+          <h3>Caneca com Nome</h3>
+          <p>Escolha seu nome e estilo favorito.</p>
+          <strong>R$ 35,00</strong>
+          <button class="add-to-cart" data-name="Caneca com Nome" data-price="35.00">Adicionar ao Carrinho</button>
+        </div>
+
+        <div class="product-card fade-in">
+          <img src="imagens/caneca2.jpg" alt="Caneca com Foto">
+          <h3>Caneca com Foto</h3>
+          <p>Imprima aquela lembrança especial em sua caneca.</p>
+          <strong>R$ 39,00</strong>
+          <button class="add-to-cart" data-name="Caneca com Foto" data-price="39.00">Adicionar ao Carrinho</button>
+        </div>
+
+        <div class="product-card fade-in">
+          <img src="imagens/caneca3.jpg" alt="Caneca Geek">
+          <h3>Caneca Geek</h3>
+          <p>Modelos divertidos para os apaixonados por séries e games.</p>
+          <strong>R$ 42,00</strong>
+          <button class="add-to-cart" data-name="Caneca Geek" data-price="42.00">Adicionar ao Carrinho</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Formulário de Personalização -->
+    <section>
+      <h2 class="fade-in">Peça sua Caneca Personalizada</h2>
+      <form class="form-canecas fade-in">
+        <label for="nome">Nome / Frase na Caneca:</label>
+        <input type="text" id="nome" name="nome" placeholder="Digite o nome ou frase">
+
+        <label for="cor">Cor da Caneca:</label>
+        <select id="cor" name="cor">
+          <option>Branca</option>
+          <option>Preta</option>
+          <option>Vermelha</option>
+          <option>Azul</option>
+        </select>
+
+        <label for="imagem">Envie uma Imagem (opcional):</label>
+        <input type="file" id="imagem" name="imagem">
+
+        <button type="submit">Solicitar Orçamento</button>
+      </form>
+    </section>
+  </main>
+
+<footer class="expanded-footer">
+  <div class="footer-container">
+    
+    <!-- Coluna 1: Informações da Loja -->
+    <div class="footer-column">
+      <h3>Miau Presentes</h3>
+      <p>Sua loja de presentes criativos e personalizados.</p>
+      <p>&copy; 2025 Miau Presentes - Todos os direitos reservados</p>
+    </div>
+
+    <!-- Coluna 2: Links Úteis -->
+    <div class="footer-column">
+      <h3>Links Úteis</h3>
+      <ul>
+        <li><a href="index.html">Página Inicial</a></li>
+        <li><a href="produtos.html">Produtos</a></li>
+        <li><a href="sobre.html">Sobre Nós</a></li>
+        <li><a href="contato.html">Contato</a></li>
+      </ul>
+    </div>
+
+    <!-- Coluna 3: Contato -->
+    <div class="footer-column">
+      <h3>Fale Conosco</h3>
+      <p>E-mail: <a href="mailto:contato@miau.com">contato@miau.com</a></p>
+      <p>Telefone: <a href="https://wa.me/553599879068">(35) 9987-9068</a></p>
+      <p>Endereço:Praça Barão de Cambui, x - Cassia MG</p>
+    </div>
+
+    <!-- Coluna 4: Redes Sociais -->
+    <div class="footer-column">
+      <h3>Redes Sociais</h3>
+      <div class="social-links">
+        <a href="https://instagram.com/miau.cassia" target="_blank">Instagram 📸</a>
+        <a href="#" target="_blank">Facebook 👍</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+  <!-- Botão WhatsApp Fixo -->
+  <a href="https://wa.me/553599879068?text=Olá! Gostaria de personalizar uma caneca." 
+     class="whatsapp-float" target="_blank">💬</a>
+
+  <!-- SCRIPTS -->
+  <script src="js/animation.js"></script>
+  <script src="js/estoque.js"></script>
+
+</body>
+</html>

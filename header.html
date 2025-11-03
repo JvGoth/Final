@@ -1,0 +1,94 @@
+<!-- BARRA DE PROMOÇÃO -->
+<div class="promo-bar">🎉 Promoção: Frete grátis para compras acima de R$.x.! 🎁</div>
+
+<!-- HEADER -->
+<header id="main-header">
+  <a href="index.html" class="logo-link">
+      <div class="logo-container">
+          <img src="Miau.jpg" alt="Miau Presentes Logo" class="logo">
+          <h1>Miau Presentes</h1>
+      </div>
+  </a>
+  
+  <div class="search-bar">
+      <input type="text" placeholder="Buscar produtos, presentes, canecas...">
+      <button type="submit" aria-label="Buscar">🔍</button>
+  </div>
+  
+  <div class="menu-toggle" id="mobile-menu">
+      <span></span>
+      <span></span>
+      <span></span>
+  </div>
+
+  <!-- CARRINHO -->
+<div class="header-icons">
+  <div class="cart-icon" id="cart-icon">
+    🛒
+    <span id="cart-count" class="cart-count">0</span>
+  </div>
+  <div class="profile-icon" id="profile-icon">
+    👤
+  </div>
+</div>
+</header>
+
+<div class="cart-modal" id="cart-modal">
+  <div class="cart-modal-content">
+    <span class="close-cart" id="close-cart">&times;</span>
+    <h2>Meu Carrinho</h2>
+
+    <div id="cart-items-container">
+      <p class="cart-empty">Seu carrinho está vazio.</p>
+    </div>
+
+    <div class="cart-summary">
+      <strong>Total: <span id="cart-total">R$ 0,00</span></strong>
+      <button class="btn-checkout" id="checkout-btn">Finalizar Pedido (WhatsApp)</button>
+    </div>
+  </div>
+</div>
+
+<!-- Novo Modal para Perfil -->
+<div class="profile-modal" id="profile-modal">
+  <div class="profile-modal-content">
+    <span class="close-profile" id="close-profile">&times;</span>
+    <h2>Meu Perfil</h2>
+
+    <!-- Área para exibir dados do usuário e histórico -->
+    <div id="profile-info"></div>
+
+    <!-- Formulário de Registro/Login (se não logado) -->
+    <div id="auth-forms" style="display: none;">
+      <h3>Criar Conta</h3>
+      <form id="register-form">
+        <input type="text" id="reg-name" placeholder="Nome" required>
+        <input type="email" id="reg-email" placeholder="Email" required>
+        <input type="password" id="reg-password" placeholder="Senha" required>
+        <button type="submit">Registrar</button>
+      </form>
+
+      <h3>Login</h3>
+      <form id="login-form">
+        <input type="email" id="login-email" placeholder="Email" required>
+        <input type="password" id="login-password" placeholder="Senha" required>
+        <button type="submit">Entrar</button>
+      </form>
+    </div>
+
+    <!-- Botão de Logout (se logado) -->
+    <button id="logout-btn" style="display: none;">Sair</button>
+  </div>
+</div>
+
+<!-- MENU DE NAVEGAÇÃO -->
+<nav class="menu-bar" id="sticky-menu">
+  <ul class="nav-list">
+      <li><a href="produtos.html">Produtos</a></li>
+      <li><a href="canecas.html">Canecas</a></li>
+      <li><a href="sobre.html">Sobre</a></li>
+      <li><a href="contato.html">Contato</a></li>
+      <li><a href="admin.html">Admin</a></li>
+  </ul>
+</nav>
+</div>
