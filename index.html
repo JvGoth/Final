@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Miau Presentes - Home</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- HEADER -->
+  <header>
+    <div class="logo-container">
+      <img src="Miau.jpg" alt="Miau Presentes Logo" class="logo">
+      <h1>Miau Presentes</h1>
+    </div>
+    <nav>
+      <div class="menu-toggle" id="mobile-menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <ul class="nav-list">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="produtos.html">Produtos</a></li>
+        <li><a href="sobre.html">Sobre</a></li>
+        <li><a href="contato.html">Contato</a></li>
+        <li><a href="canecas.html">Canecas</a></li>
+        <li><a href="admin.html">Admin</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- BARRA DE PROMOÇÃO -->
+  <div class="promo-bar">🎉 Promoção: Frete grátis para compras acima de R$.x.! 🎁</div>
+
+  <!-- CARROSSEL DE PRODUTOS EM DESTAQUE -->
+  <section>
+    <h2>✨ Produtos em Destaque</h2>
+    <div class="carousel">
+      <div class="carousel-container" id="carousel-container">
+        <div class="carousel-item fade-in">
+          <img src="https://via.placeholder.com/300x250.png?text=Caneca+Personalizada" alt="Caneca personalizada">
+          <h4>Canecas Personalizadas</h4>
+          <p>Monte sua caneca com foto, frase ou arte exclusiva.</p>
+          <a href="canecas.html" class="btn">Personalizar</a>
+        </div>
+        <div class="carousel-item fade-in">
+          <img src="https://via.placeholder.com/300x250.png?text=Caderno+Criativo" alt="Caderno Criativo">
+          <h4>Cadernos</h4>
+          <p>Cadernos para estudo ou anotações.</p>
+          <a href="produtos.html" class="btn">Ver Mais</a>
+        </div>
+        <div class="carousel-item fade-in">
+          <img src="https://via.placeholder.com/300x250.png?text=Kit+Presentes" alt="Kit Presentes">
+          <h4>Kits para Presente</h4>
+          <p>Surpreenda quem você ama com nossos kits exclusivos.</p>
+          <a href="produtos.html" class="btn">Ver Mais</a>
+        </div>
+      </div>
+      <!-- Botões do carrossel -->
+      <button class="carousel-btn left" id="prev">&#10094;</button>
+      <button class="carousel-btn right" id="next">&#10095;</button>
+    </div>
+  </section>
+
+  <!-- PRODUTOS DINÂMICOS -->
+  <section class="dynamic-products">
+    <h2>🛍️ Produtos em Promoção</h2>
+    <div class="product-list" id="dynamic-product-list"></div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>&copy; 2025 Miau Presentes - Todos os direitos reservados</p>
+  </footer>
+
+  <!-- BOTÃO FIXO WHATSAPP -->
+  <a href="https://wa.me/553599879068?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20os%20produtos%20da%20Miau%20Presentes." 
+     class="whatsapp-float" target="_blank">💬</a>
+
+  <!-- SCRIPTS -->
+  <script>
+    // Menu hambúrguer
+    const menuToggle = document.getElementById('mobile-menu');
+    const navList = document.querySelector('.nav-list');
+    menuToggle.addEventListener('click', () => {
+      navList.classList.toggle('active');
+    });
+
+    // Carrossel
+    const carouselContainer = document.getElementById("carousel-container");
+    const items = document.querySelectorAll(".carousel-item");
+    const totalItems = items.length;
+    let index = 0;
+    let autoSlide;
+
+    function updateCarousel() {
+      carouselContainer.style.transform = `translateX(${-index * 100}%)`;
+    }
+
+    function nextSlide() {
+      index = (index + 1) % totalItems;
+      updateCarousel();
+    }
+
+    function prevSlide() {
+      index = (index - 1 + totalItems) % totalItems;
+      updateCarousel();
+    }
+
+    document.getElementById("next").addEventListener("click", () => { nextSlide(); resetAutoSlide(); });
+    document.getElementById("prev").addEventListener("click", () => { prevSlide(); resetAutoSlide(); });
+
+    function startAutoSlide() { autoSlide = setInterval(nextSlide, 5000); }
+    function resetAutoSlide() { clearInterval(autoSlide); startAutoSlide(); }
+    startAutoSlide();
+
+    // Carregar produtos dinâmicos do localStorage
+    const productList = document.getElementById("dynamic-product-list");
+    function loadProducts() {
+      const products = JSON.parse(localStorage.getItem("products")) || [];
+      productList.innerHTML = "";
+      if(products.length === 0) {
+        productList.innerHTML = "<p>Nenhum produto cadastrado ainda.</p>";
+        return;
+      }
+      products.forEach(p => {
+        const div = document.createElement("div");
+        div.classList.add("product-card");
+
+        // Mostrar estoque apenas se for menor ou igual a 5
+        let stockText = "";
+        if(p.stock && p.stock <= 5) {
+          stockText = `<p class="stock">Restam ${p.stock} unidades!</p>`;
+        }
+
+        const message = encodeURIComponent(`Olá! Tenho interesse no produto "${p.name}" que vi no site.`);
+        const whatsappNumber = "5535992004450"; // número da loja
+        div.innerHTML = `
+          <img src="${p.image}" alt="${p.name}">
+          <h3>${p.name}</h3>
+          <p>${p.desc}</p>
+          <strong>R$ ${p.price}</strong>
+          ${stockText}
+          <a href="https://wa.me/${whatsappNumber}?text=${message}" target="_blank" class="buy-btn">Comprar pelo WhatsApp</a>
+        `;
+        productList.appendChild(div);
+      });
+    }
+    loadProducts();
+
+    // Fade-in ao rolar
+    const faders = document.querySelectorAll('.fade-in');
+    const appearOptions = { threshold: 0.2 };
+    const appearOnScroll = new IntersectionObserver(function(entries, observer) {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("show");
+          observer.unobserve(entry.target);
+        }
+      });
+    }, appearOptions);
+
+    faders.forEach(fader => {
+      appearOnScroll.observe(fader);
+    });
+  </script>
+</body>
+</html>

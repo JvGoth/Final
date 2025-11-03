@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Produtos - Miau Presentes</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script>
+    // Mostrar aviso de estoque baixo
+    document.addEventListener("DOMContentLoaded", () => {
+      document.querySelectorAll(".stock").forEach(el => {
+        const qtd = parseInt(el.dataset.qtd);
+        if (qtd <= 5) {
+          el.textContent = `⚠ Restam apenas ${qtd} unidades!`;
+          el.style.display = "block";
+        } else {
+          el.style.display = "none";
+        }
+      });
+
+      // Fade-in animado
+      const faders = document.querySelectorAll(".fade-in");
+      const options = { threshold: 0.2 };
+      const observer = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("show");
+            obs.unobserve(entry.target);
+          }
+        });
+      }, options);
+      faders.forEach(fader => observer.observe(fader));
+    });
+  </script>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="logo-container">
+      <img src="Miau.jpg" alt="Logo Miau Presentes" class="logo">
+      <h1>Miau Presentes</h1>
+    </div>
+    <nav>
+      <ul class="nav-list">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="produtos.html">Produtos</a></li>
+        <li><a href="canecas.html">Canecas</a></li>
+        <li><a href="sobre.html">Sobre</a></li>
+        <li><a href="contato.html">Contato</a></li>
+      </ul>
+      <div class="menu-toggle" onclick="document.querySelector('.nav-list').classList.toggle('active')">
+        <span></span><span></span><span></span>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Barra de Promoção -->
+  <div class="promo-bar">✨ Frete grátis para compras acima de R$ 100,00! ✨</div>
+
+  <!-- Produtos -->
+  <section>
+    <h2 class="fade-in">Nossos Produtos</h2>
+    <div class="product-list">
+      <div class="product-card fade-in">
+        <img src="imagens/caderno.jpg" alt="Caderno">
+        <h3>Caderno Personalizado</h3>
+        <p>Capa foda e folhas de alta qualidade.</p>
+        <strong>R$ 25,00</strong>
+        <p class="stock" data-qtd="3"></p>
+        <a href="https://wa.me/553599879068?text=Olá! Quero comprar um Caderno Personalizado." target="_blank" class="buy-btn">Comprar pelo WhatsApp</a>
+      </div>
+
+      <div class="product-card fade-in">
+        <img src="imagens/caneta.jpg" alt="Kit Canetas">
+        <h3>Kit Canetas Coloridas</h3>
+        <p>Perfeito para estudos e pintar boob goods.</p>
+        <strong>R$ 15,00</strong>
+        <p class="stock" data-qtd="12"></p>
+        <a href="https://wa.me/553599879068?text=Olá! Quero comprar um Kit de Canetas Coloridas." target="_blank" class="buy-btn">Comprar pelo WhatsApp</a>
+      </div>
+
+      <div class="product-card fade-in">
+        <img src="imagens/mochila.jpg" alt="Mochila Escolar">
+        <h3>Mochila Escolar</h3>
+        <p>Durável, espaçosa e com design moderno.</p>
+        <strong>R$ 89,00</strong>
+        <p class="stock" data-qtd="5"></p>
+        <a href="https://wa.me/553599879068?text=Olá! Quero comprar uma Mochila Escolar." target="_blank" class="buy-btn">Comprar pelo WhatsApp</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 Miau Presentes - Todos os direitos reservados.</p>
+  </footer>
+
+  <!-- Botão WhatsApp Fixo -->
+  <a href="https://wa.me/553599879068?text=Olá! Gostaria de mais informações sobre os produtos." 
+     class="whatsapp-float" target="_blank">💬</a>
+</body>
+</html>
