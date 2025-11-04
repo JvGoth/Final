@@ -6,71 +6,79 @@ const READ_DATA_URL = '/.netlify/functions/ler_dados_produto';
  * Ela itera sobre todos os elementos com a classe .product-card.
  */
 async function atualizarDadosDosProdutos() {
-    // Busca todos os cards que possuem o SKU
-    const productCards = document.querySelectorAll('.product-card, .carousel-item');
+    // Busca todos os cards que possuem o ID
+    const productCards = document.querySelectorAll('.product-card, .carousel-item');
 
-    for (const card of productCards) {
-        // Assume que o SKU está no data-sku do cartão
-        const idChave = card.dataset.id; 
+    for (const card of productCards) {
+        // Assume que o ID está no data-id do cartão
+        const idChave = card.dataset.id; 
 
-        if (!sku) {
-            continue; 
-        }
+        if (!idChave) { // CORREÇÃO: Usando idChave
+            continue; 
+        }
 
-        try {
-            // 1. CHAMA A NETLIFY FUNCTION de forma segura
-            const response = await fetch(`/.netlify/functions/ler_dados_produto?id=${idChave}`);
+        try {
+            // 1. CHAMA A NETLIFY FUNCTION de forma segura, passando 'id'
+            const response = await fetch(`/.netlify/functions/ler_dados_produto?id=${idChave}`);
 
-            if (response.ok) {
-                const dadosProduto = await response.json();
-                
-                // 2. ATUALIZA O PREÇO
-                const priceElement = card.querySelector('.product-price') || card.querySelector('.price');
-                if (priceElement) {
-                    priceElement.textContent = dadosProduto.preco.toLocaleString('pt-BR', {
-                        style: 'currency',
-                        currency: 'BRL'
-                    });
-                    
-                    // ATENÇÃO: Atualiza o data-price para que o cart.js possa funcionar
-                    const addToCartButton = card.querySelector('.add-to-cart');
-                    if (addToCartButton) {
-                        addToCartButton.dataset.price = dadosProduto.preco; 
-                    }
+            if (response.ok) {
+                const dadosProduto = await response.json();
+                
+                // 2. ATUALIZA O PREÇO
+                const priceElement = card.querySelector('.product-price') || card.querySelector('.price') || card.querySelector('strong'); // Adicionado 'strong' para o index.html
+                if (priceElement) {
+                    priceElement.textContent = dadosProduto.preco.toLocaleString('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL'
+                    });
+                    
+                    // ATENÇÃO: Atualiza o data-price para que o cart.js possa funcionar
+                    const addToCartButton = card.querySelector('.add-to-cart');
+                    if (addToCartButton) {
+                        addToCartButton.dataset.price = dadosProduto.preco; 
+                    }
+                }
+
+                // 3. ATUALIZA O ESTOQUE
+                // Se não existir um elemento .stock, ele será criado dentro do card
+                let stockElement = card.querySelector('.stock') || card.querySelector('.estoque-info');
+                if (!stockElement) {
+                    stockElement = document.createElement('p');
+                    stockElement.classList.add('stock');
+                    card.appendChild(stockElement); // Adiciona ao final do card
                 }
+                
+                if (stockElement) {
+                    const qtd = dadosProduto.estoque;
+                    
+                    if (qtd > 0 && qtd <= 5) {
+                        stockElement.textContent = `⚠ Restam apenas ${qtd} unidades!`;
+                        stockElement.style.display = "block";
+                    } else if (qtd > 5) {
+                        stockElement.style.display = "none";
+                    } else {
+                        stockElement.textContent = `Produto Esgotado!`;
+                        stockElement.style.display = "block";
+                        const buyButton = card.querySelector('.add-to-cart');
+                        if (buyButton) {
+                             buyButton.textContent = 'Esgotado';
+                             buyButton.disabled = true; 
+                        }
+                    }
+                }
+                
+            } else {
+                // CORREÇÃO: Usando idChave
+                console.warn(`Produto ID ${idChave} não encontrado no cache do Bling. Mantendo dados estáticos.`);
+                // Opcional: Se não encontrar, você pode desabilitar o botão de compra
+            }
 
-                // 3. ATUALIZA O ESTOQUE
-                const stockElement = card.querySelector('.stock') || card.querySelector('.estoque-info'); 
-                if (stockElement) {
-                    const qtd = dadosProduto.estoque;
-                    
-                    if (qtd > 0 && qtd <= 5) {
-                        stockElement.textContent = `⚠ Restam apenas ${qtd} unidades!`;
-                        stockElement.style.display = "block";
-                    } else if (qtd > 5) {
-                        stockElement.style.display = "none";
-                    } else {
-                        stockElement.textContent = `Produto Esgotado!`;
-                        stockElement.style.display = "block";
-                        const buyButton = card.querySelector('.add-to-cart');
-                        if (buyButton) {
-                             buyButton.textContent = 'Esgotado';
-                             buyButton.disabled = true; 
-                        }
-                    }
-                }
-                
-            } else {
-                console.warn(`Produto SKU ${sku} não encontrado no cache do Bling. Mantendo dados estáticos.`);
-                // Opcional: Se não encontrar, você pode desabilitar o botão de compra
-            }
-
-        } catch (error) {
-            console.error(`Erro ao processar o SKU ${sku}:`, error);
-        }
-    }
+        } catch (error) {
+            // CORREÇÃO: Usando idChave
+            console.error(`Erro ao processar o ID ${idChave}:`, error);
+        }
+    }
 }
 
 // Garante que a função rode após a página carregar
 document.addEventListener("DOMContentLoaded", atualizarDadosDosProdutos);
-
