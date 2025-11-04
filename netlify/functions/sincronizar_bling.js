@@ -1,28 +1,26 @@
 import { getStore } from "@netlify/blobs";
 import fetch from "node-fetch";
 
-// Esta função será agendada para rodar automaticamente
 exports.handler = async () => {
-  // A CHAVE API É LIDA AQUI (seguramente do Netlify Environment)
   const apiKey = process.env.BLING_API_KEY; 
   if (!apiKey) {
     return { statusCode: 500, body: "API Key do Bling não configurada." };
   }
 
   try {
-    // 1. CHAMA A API DO BLING (Busca todos os produtos ativos)
+    // Filtro: Apenas produtos com Situação "Ativo" [A]
     const url = `https://bling.com.br/Api/v2/produtos/json/?apikey=${apiKey}&filters=situacao[A]`;
     const response = await fetch(url);
     const dados = await response.json();
 
     if (dados.retorno && dados.retorno.produtos) {
-      const store = getStore("produtos_bling"); // O seu cache de dados
+      const store = getStore("produtos_bling");
       let produtosSalvos = 0;
       
       for (const item of dados.retorno.produtos) {
         const produto = item.produto;
         
-        // USAR O ID INTERNO COMO CHAVE
+        // USAR O ID INTERNO COMO CHAVE, POIS O CÓDIGO (SKU) ESTÁ VAZIO
         const idChave = produto.id; 
 
         if (!idChave) {
@@ -32,7 +30,7 @@ exports.handler = async () => {
 
         console.log(`Sincronizando produto ID: ${idChave}`);
 
-        // A CHAVE AGORA É idChave e as propriedades estão corretamente dentro do objeto {}
+        // SALVA NO BLOBS USANDO O ID COMO CHAVE
         await store.setJSON(idChave, {
             nome: produto.descricao,
             preco: parseFloat(produto.preco),
@@ -46,12 +44,17 @@ exports.handler = async () => {
       console.log(`Sincronização Bling > Netlify Blobs concluída. ${produtosSalvos} produtos atualizados.`);
       return { statusCode: 200 };
       
+    } else if (dados.retorno?.erros) {
+        // Se a chave API for inválida ou faltar permissão, o Bling retorna um erro aqui
+      console.error("Erro na resposta do Bling:", dados.retorno.erros);
+      return { statusCode: 500, body: JSON.stringify(dados.retorno.erros) };
     } else {
-      console.error("Erro na resposta do Bling ou nenhum produto encontrado:", dados.retorno?.erros);
-      return { statusCode: 500, body: JSON.stringify(dados.retorno?.erros || { error: "Resposta do Bling inesperada." }) };
-    }
+        // Caso de não haver produtos ativos ou outro erro não mapeado
+        console.log("Nenhum produto ativo encontrado ou resposta do Bling inesperada.");
+        return { statusCode: 200, body: "Nenhum produto ativo encontrado." };
+    }
   } catch (error) {
     console.error("Erro fatal durante a sincronização:", error);
-    return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
+    return { statusCode: 500, body: JSON.stringify({ error: error.message, stack: error.stack }) };
   }
 };
