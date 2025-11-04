@@ -1,8 +1,6 @@
-// netlify/functions/ler_dados_produto.js
-
 import { getStore } from "@netlify/blobs";
 
-// Esta função será chamada pelo front-end do seu site
+// Esta função será chamada pelo front-end do seu site (sem chave API)
 exports.handler = async (event) => {
   const sku = event.queryStringParameters.sku;
 
