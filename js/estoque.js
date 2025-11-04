@@ -1,5 +1,3 @@
-// js/estoque.js - Versão Adaptada para Bling/Netlify Functions
-
 // URL base para sua função de leitura de dados do produto
 const READ_DATA_URL = '/.netlify/functions/ler_dados_produto';
 
@@ -8,14 +6,13 @@ const READ_DATA_URL = '/.netlify/functions/ler_dados_produto';
  * Ela itera sobre todos os elementos com a classe .product-card.
  */
 async function atualizarDadosDosProdutos() {
-    // Busca todos os cards que possuem o SKU, incluindo os do carrossel
+    // Busca todos os cards que possuem o SKU
     const productCards = document.querySelectorAll('.product-card, .carousel-item');
 
     for (const card of productCards) {
-        // Assume que o SKU está no data-sku do cartão ou em um elemento interno
+        // Assume que o SKU está no data-sku do cartão
         const sku = card.dataset.sku; 
 
-        // Se o card não tiver o atributo data-sku, pulamos para o próximo
         if (!sku) {
             continue; 
         }
@@ -35,7 +32,7 @@ async function atualizarDadosDosProdutos() {
                         currency: 'BRL'
                     });
                     
-                    // ATENÇÃO: Atualiza o data-price para que o cart.js possa funcionar corretamente
+                    // ATENÇÃO: Atualiza o data-price para que o cart.js possa funcionar
                     const addToCartButton = card.querySelector('.add-to-cart');
                     if (addToCartButton) {
                         addToCartButton.dataset.price = dadosProduto.preco; 
@@ -64,7 +61,8 @@ async function atualizarDadosDosProdutos() {
                 }
                 
             } else {
-                console.warn(`Produto SKU ${sku} não encontrado no cache do Bling.`);
+                console.warn(`Produto SKU ${sku} não encontrado no cache do Bling. Mantendo dados estáticos.`);
+                // Opcional: Se não encontrar, você pode desabilitar o botão de compra
             }
 
         } catch (error) {
