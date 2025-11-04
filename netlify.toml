@@ -4,7 +4,7 @@
   command = "npm install" 
   
   functions = "netlify/functions"
-  publish = "docs" # Mantenha a sua pasta de publicação correta
+  publish = "." # Mantenha a sua pasta de publicação correta
 
 [functions."sincronizar_bling"]
   schedule = "*/5 * * * *"
