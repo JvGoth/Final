@@ -1,15 +1,10 @@
 [build]
-  # Esta linha diz ao Netlify onde procurar suas funções
+  # O comando de build que o Netlify deve executar
+  # Isso garante que o 'npm install' seja rodado antes de tentar rodar as funções
+  command = "npm install" 
+  
   functions = "netlify/functions"
-  # Seus arquivos HTML/CSS/JS (o front-end) são publicados desta pasta.
-  # Ajuste 'docs' se a sua pasta de deploy for 'dist' ou outra.
-  publish = "docs" 
-
-[functions]
-  # Opção para configurar o timeout (opcional, mas bom se for rodar mais de 10s)
-  # timeout = 60 
+  publish = "docs" # Mantenha a sua pasta de publicação correta
 
 [functions."sincronizar_bling"]
-# O nome da função aqui deve ser EXATAMENTE o nome do arquivo (sincronizar_bling.js)
-# Esta linha agenda a função para rodar a cada 5 minutos
-schedule = "*/5 * * * *"
+  schedule = "*/5 * * * *"
