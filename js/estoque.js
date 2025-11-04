@@ -11,7 +11,7 @@ async function atualizarDadosDosProdutos() {
 
     for (const card of productCards) {
         // Assume que o SKU está no data-sku do cartão
-        const sku = card.dataset.sku; 
+        const idChave = card.dataset.id; 
 
         if (!sku) {
             continue; 
@@ -19,7 +19,7 @@ async function atualizarDadosDosProdutos() {
 
         try {
             // 1. CHAMA A NETLIFY FUNCTION de forma segura
-            const response = await fetch(`${READ_DATA_URL}?sku=${sku}`);
+            const response = await fetch(`/.netlify/functions/ler_dados_produto?id=${idChave}`);
 
             if (response.ok) {
                 const dadosProduto = await response.json();
@@ -73,3 +73,4 @@ async function atualizarDadosDosProdutos() {
 
 // Garante que a função rode após a página carregar
 document.addEventListener("DOMContentLoaded", atualizarDadosDosProdutos);
+
