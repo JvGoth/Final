@@ -1,13 +1,7 @@
 [build]
-  # O comando de build para instalar as dependências
-  command = "npm install" 
-  
-  # A pasta onde estão os arquivos HTML/CSS/JS (O index.html está na raiz)
-  publish = "." 
-  
-  # Onde estão as funções do Netlify
-  functions = "netlify/functions"
+command = "npm install" 
+publish = "." 
+functions = "netlify/functions"
 
 [functions."sincronizar_bling"]
-  # Agenda a função sincronizar_bling.js para rodar a cada 5 minutos
-  schedule = "*/5 * * * *"
+schedule = "*/5 * * * *"
