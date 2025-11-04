@@ -3,7 +3,7 @@
   # Esta linha diz ao Netlify onde procurar suas funções (OK, você já tem essa pasta)
   directory = "netlify/functions"
 
-[functions."sincronizar-bling"]
+[functions."sincronizar_bling"]
 # Esta linha agenda a função "sincronizar_bling.js" para rodar a cada 5 minutos
 # O nome da função no TOML deve ser o nome do arquivo, mas sem a extensão .js
 schedule = "*/5 * * * *"
