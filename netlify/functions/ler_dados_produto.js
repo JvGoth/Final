@@ -2,15 +2,18 @@ import { getStore } from "@netlify/blobs";
 
 // Esta função será chamada pelo front-end do seu site (sem chave API)
 exports.handler = async (event) => {
-  const sku = event.queryStringParameters.sku;
+  const idChave = event.queryStringParameters.id; // Pega o novo parâmetro 'id'
 
-  if (!sku) {
-    return { statusCode: 400, body: JSON.stringify({ error: "Parâmetro SKU é obrigatório." }) };
+  if (!idChave) {
+    return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'Parâmetro id ausente.' })
+    };
   }
 
   try {
     const store = getStore("produtos_bling");
-    const dadosProduto = await store.getJSON(sku);
+    const produtoDados = await store.getJSON(idChave);
 
     if (dadosProduto) {
       // Retorna os dados do produto (preço, estoque) para o front-end
