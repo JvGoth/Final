@@ -21,11 +21,22 @@ exports.handler = async () => {
       
       for (const item of dados.retorno.produtos) {
         const produto = item.produto;
-        const sku = produto.codigo; 
+        // Usamos o ID do produto como chave, já que o SKU (código) está ausente.
+        const idChave = produto.id; 
 
-        if (sku) {
-          // 2. SALVA NO NETLIFY BLOBS
-          await store.setJSON(sku, {
+        // [IMPORTANTE] Agora não ignoramos mais, usamos o ID interno.
+        if (!idChave) {
+          console.error(`[ERRO FATAL] Produto sem ID não pode ser sincronizado!`);
+          continue;
+        }
+
+        console.log(`Sincronizando produto ID: ${idChave}`);
+
+        // A chave para salvar no Blob é agora o ID
+        await store.setJSON(idChave, {
+        // ... o restante do código que extrai os dados continua igual
+        // A única coisa que muda é que a chave de acesso é 'idChave'
+        });
             nome: produto.descricao,
             preco: parseFloat(produto.preco),
             estoque: parseInt(produto.estoqueAtual),
