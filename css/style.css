@@ -8,7 +8,6 @@
   font-family: Arial, sans-serif;
 }
 
-/* [NOVO] Helper para travar o scroll no menu mobile */
 body.menu-open {
   overflow: hidden;
 }
@@ -72,9 +71,7 @@ header:hover {
     padding: 0px 20px; 
     width: 100%;
     
-    /* CHAVE: Mudar para fixed e adicionar transição */
     position: fixed;
-    /* O valor de 'top' será definido dinamicamente pelo JS */
     z-index: 999; 
     transition: all 0.3s ease-in-out;
     
@@ -805,13 +802,13 @@ p {
 
 .product-card strong {
   font-size: 1.1rem;
-  color: #9baa56;
+  color: #435535 ;
   display: block;
   margin: 10px 0;
 }
 
 .add-to-cart {
-  background: #9baa56;
+  background: #75826a;
   color: #fff;
   border: none;
   padding: 10px 16px;
@@ -825,7 +822,7 @@ p {
 }
 
 .add-to-cart:hover {
-  background: #849648;
+  background: #dba67b;
 }
 
 /* ===========================
@@ -890,7 +887,7 @@ form button {
 }
 
 form button:hover {
-  background: #e63950;
+  background: #dba67b;
   transform: translateY(-2px); /* Levanta botão no hover */
 }
 
