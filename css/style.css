@@ -13,7 +13,7 @@ body.menu-open {
 }
 
 body {
-  background-image: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.658)), url(fundo1.jpg);
+  background-image: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.658)), url(Fundo.jpg);
   line-height: 1.6;
   margin: 0;
   padding-bottom: 0;
@@ -1071,5 +1071,6 @@ form button:hover {
   opacity: 1;
   transform: translateY(0);
 }
+
 
 
