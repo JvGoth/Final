@@ -52,7 +52,7 @@
     <!-- Formulário de Personalização -->
     <section>
       <h2 class="fade-in">Peça sua Caneca Personalizada</h2>
-      <form class="form-canecas fade-in">
+      <form class="form-canecas fade-in" id="custom-mug-form">
         <label for="nome">Nome / Frase na Caneca:</label>
         <input type="text" id="nome" name="nome" placeholder="Digite o nome ou frase">
 
@@ -67,7 +67,7 @@
         <label for="imagem">Envie uma Imagem (opcional):</label>
         <input type="file" id="imagem" name="imagem">
 
-        <button type="submit">Solicitar Orçamento</button>
+        <button type="button" id="submit-custom-mug">Solicitar Orçamento</button>
       </form>
     </section>
   </main>
@@ -106,7 +106,7 @@
       <h3>Redes Sociais</h3>
       <div class="social-links">
         <a href="https://instagram.com/miau.cassia" target="_blank">Instagram 📸</a>
-        <a href="#" target="_blank">Facebook 👍</a>
+        <a href="https://www.facebook.com/share/1CQ9RPEPv8/?mibextid=wwXIfr" target="_blank">Facebook 👍</a>
       </div>
     </div>
   </div>
@@ -119,6 +119,7 @@
   <!-- SCRIPTS -->
   <script src="js/animation.js"></script>
   <script src="js/estoque.js"></script>
+  <script src="js/custom-mug.js" defer></script>
 
 </body>
 </html>
