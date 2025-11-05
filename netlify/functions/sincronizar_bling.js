@@ -12,7 +12,7 @@ exports.handler = async () => {
 
   try {
     // 1. CHAMA A API DO BLING (Busca todos os produtos ativos)
-    const url = `https://bling.com.br/Api/v3/produtos/json/?apikey=${apiKey}&filters=situacao[A]`;
+    const url = `https://bling.com.br/Api/v2/produtos/json/?apikey=${apiKey}&filters=situacao[A]`;
     const response = await fetch(url);
     const dados = await response.json();
 
