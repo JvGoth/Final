@@ -1,6 +1,6 @@
 // sincronizar_bling.js (versão corrigida)
 
-const { getStore } = require("@netlify/blobs");
+const store = getStore({ name: "produtos_bling", siteID: process.env.NETLIFY_SITE_ID, token: process.env.NETLIFY_API_TOKEN });
 
 exports.handler = async () => {
     const accessToken = process.env.BLING_ACCESS_TOKEN;
