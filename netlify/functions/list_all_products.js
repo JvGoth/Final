@@ -1,7 +1,6 @@
 // Arquivo: netlify/functions/list_all_products.js (CORRIGIDO)
 
-// CORREÇÃO: Usando a sintaxe de require() para compatibilidade com Netlify Functions
-const { getStore } = require("@netlify/blobs");
+const store = getStore({ name: "produtos_bling", siteID: process.env.NETLIFY_SITE_ID, token: process.env.NETLIFY_API_TOKEN });
 
 exports.handler = async () => {
     try {
@@ -35,4 +34,5 @@ exports.handler = async () => {
             body: JSON.stringify({ error: "Erro ao buscar a lista de produtos do banco de dados.", details: error.message }) 
         };
     }
+
 };
