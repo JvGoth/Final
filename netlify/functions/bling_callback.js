@@ -55,40 +55,6 @@ exports.handler = async (event) => {
         });
 
         const data = await response.json();
-
-        if (response.ok && data.access_token) {
-            // 4. SUCESSO: Retorna os tokens para o usuário
-            // AVISO: NÃO MANTENHA ESTA FUNÇÃO NO AR APÓS OBTER SEUS TOKENS!
-            return {
-                statusCode: 200,
-                headers: { 'Content-Type': 'text/html' },
-                body: `
-                    <h1>SUCESSO! TOKENS OBTIDOS</h1>
-                    <p>O Bling autorizou sua aplicação. Você precisa **COPIAR E SALVAR** os tokens abaixo como variáveis de ambiente no Netlify.</p>
-                    
-                    <h2 style="color: green;">PASSO 1: Access Token (Uso Imediato)</h2>
-                    <textarea rows="4" cols="80" onclick="this.select();">${data.access_token}</textarea>
-                    
-                    <h2 style="color: orange;">PASSO 2: Refresh Token (Para renovação automática)</h2>
-                    <textarea rows="4" cols="80" onclick="this.select();">${data.refresh_token}</textarea>
-
-                    <p style="color: red;">APÓS SALVAR OS TOKENS NO NETLIFY, REMOVA ESSA FUNÇÃO DO AR!</p>
-                    <p>Agora você deve usá-los no seu código *sincronizar_bling.js*.</p>
-                `
-            };
-        } else {
-            // 5. ERRO: Bling retornou um erro (ex: Client ID/Secret errado)
-            return {
-                statusCode: 500,
-                body: `Falha na Troca de Código (Resposta Bling): ${JSON.stringify(data, null, 2)}`
-            };
-        }
-
-    } catch (error) {
-        // 6. ERRO DE REDE: Ocorreu um erro na requisição (Network Error)
-        return {
-            statusCode: 500,
-            body: `Erro fatal de rede: ${error.message}`
         };
     }
 };
