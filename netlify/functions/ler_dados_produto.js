@@ -1,9 +1,7 @@
-// Arquivo: netlify/functions/ler_dados_produto.js (CORREÇÃO FINAL)
+// Arquivo: netlify/functions/ler_dados_produto.js
 
-// Importações (usando 'require' para máxima compatibilidade com Netlify):
 const { getStore } = require("@netlify/blobs"); 
 
-// Esta função é chamada pelo front-end (estoque.js) para obter dados individuais
 exports.handler = async (event) => {
   // O ID do produto é passado como parâmetro na URL: ?id=123456
   const idChave = event.queryStringParameters.id; 
@@ -18,20 +16,20 @@ exports.handler = async (event) => {
   try {
     const store = getStore("produtos_bling");
     
-    // 1. Busca os dados. Armazena na variável 'produtoDados'.
+    // 1. Busca os dados e armazena em 'produtoDados'
     const produtoDados = await store.getJSON(idChave); 
 
-    // 2. Verifica se a variável CORRETA tem conteúdo
-    if (produtoDados) { // <-- CORRIGIDO! Deve ser 'produtoDados'
+    // 2. Verifica se 'produtoDados' existe
+    if (produtoDados) { 
       // Retorna os dados do produto para o front-end
       return {
         statusCode: 200,
         headers: { "Content-Type": "application/json" },
-        // 3. Usa a variável CORRETA
-        body: JSON.stringify(produtoDados), // <-- CORRIGIDO! Deve ser 'produtoDados'
+        // 3. Serializa 'produtoDados'
+        body: JSON.stringify(produtoDados), 
       };
     } else {
-      // Produto não encontrado na base (N  etlify Blobs)
+      // Produto não encontrado na base (Netlify Blobs)
       return {
         statusCode: 404,
         body: JSON.stringify({ error: "Produto não encontrado ou ainda não sincronizado." }),
@@ -39,6 +37,9 @@ exports.handler = async (event) => {
     }
   } catch (error) {
     console.error("Erro ao ler dados do Blob:", error);
-    return { statusCode: 500, body: JSON.stringify({ error: "Erro interno no servidor." }) };
+    return { 
+        statusCode: 500, 
+        body: JSON.stringify({ error: "Erro interno no servidor." }) 
+    };
   }
 };
