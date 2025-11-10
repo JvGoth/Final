@@ -7,7 +7,10 @@ const CLIENT_ID = process.env.BLING_CLIENT_ID;
 // 2. O Client Secret do seu Aplicativo Bling
 const CLIENT_SECRET = process.env.BLING_CLIENT_SECRET;
 // 3. A URL de Retorno EXATA que você cadastrou no Bling (MUITO IMPORTANTE!)
-const REDIRECT_URI = 'https://miaupresentes.netlify.app/.netlify/functions/bling_callback'; 
+const REDIRECT_URI = 'https://miaupresentes.netlify.app/.netlify/functions/bling_callback';
+
+const credentials = `${CLIENT_ID}:${CLIENT_SECRET}`;
+const base64Credentials = Buffer.from(credentials).toString('base64');
 
 exports.handler = async (event) => {
     // 1. Recebe o 'code' (código de autorização) que o Bling envia
@@ -32,17 +35,17 @@ exports.handler = async (event) => {
         grant_type: 'authorization_code',
         code: code,
         redirect_uri: REDIRECT_URI,
-        client_id: CLIENT_ID,
-        client_secret: CLIENT_SECRET,
+        // CLIENT_ID e CLIENT_SECRET REMOVIDOS daqui!
     });
 
     const tokenUrl = 'https://bling.com.br/Api/v3/oauth/token';
 
     try {
-        // 3. Envia a requisição para obter os tokens
         const response = await fetch(tokenUrl, {
             method: 'POST',
             headers: {
+                // **PASSO 3: ADICIONAR O CABEÇALHO AUTHORIZATION: BASIC**
+                'Authorization': `Basic ${base64Credentials}`, 
                 'Content-Type': 'application/x-www-form-urlencoded',
                 'Accept': 'application/json'
             },
