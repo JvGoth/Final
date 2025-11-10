@@ -1,6 +1,6 @@
 // Arquivo: netlify/functions/ler_dados_produto.js
 
-const { getStore } = require("@netlify/blobs"); 
+const store = getStore({ name: "produtos_bling", siteID: process.env.NETLIFY_SITE_ID, token: process.env.NETLIFY_API_TOKEN }); 
 
 exports.handler = async (event) => {
   // O ID do produto é passado como parâmetro na URL: ?id=123456
