@@ -1,5 +1,4 @@
 // FORÇAR O USO DE REQUIRE para node-fetch e querystring
-const fetch = require("node-fetch"); 
 const querystring = require("querystring"); 
 
 // --- Variáveis de Ambiente Necessárias (Configure no Netlify!) ---
