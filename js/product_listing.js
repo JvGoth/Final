@@ -57,6 +57,7 @@ async function loadProductsFromBling() {
 
         let htmlContent = '';
         for (const id in data) {
+            if (window.location.pathname.includes('canecas.html') && !data[id].nome.toLowerCase().includes('caneca')) continue;
             // AQUI VOCÊ PODE INSERIR UM FILTRO SE QUISER SEPARAR CANECAS DE OUTROS PRODUTOS
             // Exemplo: if (window.location.pathname.includes('canecas.html') && !data[id].nome.toLowerCase().includes('caneca')) continue;
 
@@ -77,4 +78,5 @@ async function loadProductsFromBling() {
 }
 
 // Inicia o carregamento quando a página terminar de carregar
+
 document.addEventListener('DOMContentLoaded', loadProductsFromBling);
