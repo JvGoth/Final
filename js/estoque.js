@@ -1,6 +1,6 @@
 // URL base para sua função de leitura de dados do produto
 const READ_DATA_URL = '/.netlify/functions/ler_dados_produto';
-
+console.log(Buscando ID: ${idChave})
 /**
  * Função principal para buscar e atualizar o estoque e preço de todos os produtos na página.
  * Ela itera sobre todos os elementos com a classe .product-card.
