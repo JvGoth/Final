@@ -1,8 +1,10 @@
+// Arquivo: ler_dados_produto.js (CORRIGIDO)
+
 import { getStore } from "@netlify/blobs";
 
 // Esta função será chamada pelo front-end do seu site (sem chave API)
 exports.handler = async (event) => {
-  const idChave = event.queryStringParameters.id; // Pega o novo parâmetro 'id'
+  const idChave = event.queryStringParameters.id; 
 
   if (!idChave) {
     return {
@@ -13,14 +15,14 @@ exports.handler = async (event) => {
 
   try {
     const store = getStore("produtos_bling");
-    const produtoDados = await store.getJSON(idChave);
+    const produtoDados = await store.getJSON(idChave); // <-- Variável principal
 
-    if (dadosProduto) {
+    if (produtoDados) { // <-- CORRIGIDO: Deve ser 'produtoDados'
       // Retorna os dados do produto (preço, estoque) para o front-end
       return {
         statusCode: 200,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(dadosProduto),
+        body: JSON.stringify(produtoDados), // <-- CORRIGIDO: Deve ser 'produtoDados'
       };
     } else {
       // Produto não encontrado na base do Netlify Blobs
