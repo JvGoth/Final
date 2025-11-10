@@ -1,5 +1,7 @@
 // FORÇAR O USO DE REQUIRE para node-fetch e querystring
-const querystring = require("querystring"); 
+const querystring = require("querystring");
+// 💡 NOVO: Importe explicitamente o Buffer para evitar o erro "Buffer is not defined"
+const { Buffer } = require("buffer");
 
 // --- Variáveis de Ambiente Necessárias (Configure no Netlify!) ---
 // 1. O Client ID do seu Aplicativo Bling
