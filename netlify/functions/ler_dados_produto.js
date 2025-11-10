@@ -1,9 +1,11 @@
-// Arquivo: ler_dados_produto.js (CORRIGIDO)
+// Arquivo: netlify/functions/ler_dados_produto.js (CORREÇÃO FINAL)
 
-import { getStore } from "@netlify/blobs";
+// Importações (usando 'require' para máxima compatibilidade com Netlify):
+const { getStore } = require("@netlify/blobs"); 
 
-// Esta função será chamada pelo front-end do seu site (sem chave API)
+// Esta função é chamada pelo front-end (estoque.js) para obter dados individuais
 exports.handler = async (event) => {
+  // O ID do produto é passado como parâmetro na URL: ?id=123456
   const idChave = event.queryStringParameters.id; 
 
   if (!idChave) {
@@ -15,17 +17,21 @@ exports.handler = async (event) => {
 
   try {
     const store = getStore("produtos_bling");
-    const produtoDados = await store.getJSON(idChave); // <-- Variável principal
+    
+    // 1. Busca os dados. Armazena na variável 'produtoDados'.
+    const produtoDados = await store.getJSON(idChave); 
 
-    if (produtoDados) { // <-- CORRIGIDO: Deve ser 'produtoDados'
-      // Retorna os dados do produto (preço, estoque) para o front-end
+    // 2. Verifica se a variável CORRETA tem conteúdo
+    if (produtoDados) { 
+      // Retorna os dados do produto para o front-end
       return {
         statusCode: 200,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(produtoDados), // <-- CORRIGIDO: Deve ser 'produtoDados'
+        // 3. Usa a variável CORRETA
+        body: JSON.stringify(produtoDados), 
       };
     } else {
-      // Produto não encontrado na base do Netlify Blobs
+      // Produto não encontrado na base (Netlify Blobs)
       return {
         statusCode: 404,
         body: JSON.stringify({ error: "Produto não encontrado ou ainda não sincronizado." }),
