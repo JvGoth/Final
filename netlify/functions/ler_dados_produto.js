@@ -22,16 +22,16 @@ exports.handler = async (event) => {
     const produtoDados = await store.getJSON(idChave); 
 
     // 2. Verifica se a variável CORRETA tem conteúdo
-    if (produtoDados) { 
+    if (produtoDados) { // <-- CORRIGIDO! Deve ser 'produtoDados'
       // Retorna os dados do produto para o front-end
       return {
         statusCode: 200,
         headers: { "Content-Type": "application/json" },
         // 3. Usa a variável CORRETA
-        body: JSON.stringify(produtoDados), 
+        body: JSON.stringify(produtoDados), // <-- CORRIGIDO! Deve ser 'produtoDados'
       };
     } else {
-      // Produto não encontrado na base (Netlify Blobs)
+      // Produto não encontrado na base (N  etlify Blobs)
       return {
         statusCode: 404,
         body: JSON.stringify({ error: "Produto não encontrado ou ainda não sincronizado." }),
