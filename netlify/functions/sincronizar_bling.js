@@ -1,7 +1,10 @@
 // sincronizar_bling.js (versão corrigida)
 
-const store = getStore({ name: "produtos_bling", siteID: process.env.NETLIFY_SITE_ID, token: process.env.NETLIFY_API_TOKEN });
+import { getStore } from "@netlify/blobs";  // <--- ADICIONE ISSO AQUI
 
+// Remova esta linha duplicada e desnecessária: const store = getStore({ name: "produtos_bling", siteID: process.env.NETLIFY_SITE_ID, token: process.env.NETLIFY_API_TOKEN });
+
+exports.handler = async () => {
 exports.handler = async () => {
     const accessToken = process.env.BLING_ACCESS_TOKEN;
     if (!accessToken) return { statusCode: 500, body: "Access Token não configurado." };
@@ -50,5 +53,6 @@ exports.handler = async () => {
     } catch (error) {
         console.error("Erro:", error);
         return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
+    }
     }
 };
