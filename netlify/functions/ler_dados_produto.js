@@ -1,8 +1,8 @@
 // Arquivo: netlify/functions/ler_dados_produto.js
 
-import { getStore } from "@netlify/blobs";
+const { getStore } = require("@netlify/blobs");
 
-export default async (event) => {
+exports.handler = async (event) => {
   const idChave = event.queryStringParameters.id; 
 
   if (!idChave) {
@@ -13,9 +13,13 @@ export default async (event) => {
   }
 
   try {
-    const store = getStore("produtos_bling");
+    const store = getStore({
+      name: "produtos_bling",
+      siteID: process.env.NETLIFY_SITE_ID,
+      token: process.env.NETLIFY_API_TOKEN
+    });
     
-    const produtoDados = await store.getJSON(idChave); 
+    const produtoDados = await store.get(idChave, { type: "json" }); 
 
     if (produtoDados) { 
       return {
@@ -30,7 +34,7 @@ export default async (event) => {
       };
     }
   } catch (error) {
-    console.error("Erro ao ler dados do Blob:", error);
+    console.error("Erro ao ler dados do Blob:", error.message, error.stack);
     return { 
         statusCode: 500, 
         body: JSON.stringify({ error: "Erro interno no servidor." }) 
