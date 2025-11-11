@@ -2,8 +2,10 @@
   command = "npm install"  # Força instalação de dependências durante o build
   functions = "netlify/functions"  # Caminho das functions
 
-[functions]
-  node_bundler = "esbuild"  # Usa esbuild para bundling, que resolve deps melhor
+[[functions]]
+  name = "sincronizar_bling"
+  path = "/.netlify/functions/sincronizar_bling"
+  background = true
 
 [[plugins]]
   package = "@netlify/plugin-functions-install-core"  # Plugin para instalar deps em functions
