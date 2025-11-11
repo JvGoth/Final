@@ -7,7 +7,13 @@ exports.handler = async () => {
     if (!accessToken) return { statusCode: 500, body: "Access Token não configurado." };
 
     try {
-        const store = getStore("produtos_bling");
+        // Modo manual com env vars
+        const store = getStore({
+            name: "produtos_bling",
+            siteID: process.env.NETLIFY_SITE_ID,
+            token: process.env.NETLIFY_API_TOKEN
+        });
+        
         let page = 1;
         let produtosSalvos = 0;
         let hasMore = true;
