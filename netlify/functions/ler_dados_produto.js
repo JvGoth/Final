@@ -13,32 +13,31 @@ exports.handler = async (event) => {
   }
 
   try {
-      // Modo manual
-      const store = getStore({
-          name: "produtos_bling",
-          siteID: process.env.NETLIFY_SITE_ID,
-          token: process.env.NETLIFY_API_TOKEN
-      });
-      
-      const produtoDados = await store.getJSON(idChave); 
+    const store = getStore({
+        name: "produtos_bling",
+        siteID: process.env.NETLIFY_SITE_ID,
+        token: process.env.NETLIFY_API_TOKEN
+    });
+    
+    const produtoDados = await store.get(idChave, { type: "json" }); // CORRIGIDO
 
-      if (produtoDados) { 
-        return {
-          statusCode: 200,
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(produtoDados), 
-        };
-      } else {
-        return {
-          statusCode: 404,
-          body: JSON.stringify({ error: "Produto não encontrado ou ainda não sincronizado." }),
-        };
-      }
-  } catch (error) {
-      console.error("Erro ao ler dados do Blob:", error);
-      return { 
-          statusCode: 500, 
-          body: JSON.stringify({ error: "Erro interno no servidor." }) 
+    if (produtoDados) { 
+      return {
+        statusCode: 200,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(produtoDados), 
       };
+    } else {
+      return {
+        statusCode: 404,
+        body: JSON.stringify({ error: "Produto não encontrado ou ainda não sincronizado." }),
+      };
+    }
+  } catch (error) {
+    console.error("Erro ao ler dados do Blob:", error);
+    return { 
+        statusCode: 500, 
+        body: JSON.stringify({ error: "Erro interno no servidor." }) 
+    };
   }
 };
