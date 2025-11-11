@@ -7,7 +7,7 @@ exports.handler = async () => {
     if (!accessToken) return { statusCode: 500, body: "Access Token não configurado." };
 
     try {
-        // Modo manual com env vars
+        // Modo manual usando env vars
         const store = getStore({
             name: "produtos_bling",
             siteID: process.env.NETLIFY_SITE_ID,
@@ -50,7 +50,7 @@ exports.handler = async () => {
         }
 
         console.log(`Sincronizado: ${produtosSalvos} produtos.`);
-        return { statusCode: 200 };
+        return { statusCode: 200, body: "Sincronização concluída." };
 
     } catch (error) {
         console.error("Erro:", error);
