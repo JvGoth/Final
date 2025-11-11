@@ -45,8 +45,13 @@ exports.handler = async (event) => {
             return { statusCode: response.status, body: JSON.stringify(data) };
         }
 
-        const store = getStore("bling_tokens");
-        await store.setJSON("access_token", data); // Armazena todo o data (inclui refresh_token)
+        // Modo manual
+        const store = getStore({
+            name: "bling_tokens",
+            siteID: process.env.NETLIFY_SITE_ID,
+            token: process.env.NETLIFY_API_TOKEN
+        });
+        await store.setJSON("access_token", data);
 
         return {
             statusCode: 200,
