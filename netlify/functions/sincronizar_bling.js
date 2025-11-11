@@ -1,8 +1,7 @@
-// sincronizar_bling.js (versão corrigida)
+// Arquivo: netlify/functions/sincronizar_bling.js
 
-import { getStore } from "@netlify/blobs";  // <--- ADICIONE ISSO AQUI
+const { getStore } = require("@netlify/blobs");
 
-export default async () => {
 exports.handler = async () => {
     const accessToken = process.env.BLING_ACCESS_TOKEN;
     if (!accessToken) return { statusCode: 500, body: "Access Token não configurado." };
@@ -27,21 +26,20 @@ exports.handler = async () => {
             }
 
             for (const produto of dados.data) {
-                const idChave = produto.id.toString(); // Garanta string
+                const idChave = produto.id.toString();
                 const imagemUrl = produto.imagens && produto.imagens.length > 0 ? produto.imagens[0].link : null;
 
                 await store.setJSON(idChave, {
-                    nome: produto.nome, // OK
-                    preco: parseFloat(produto.precoVenda || 0), // CORRIGIDO
-                    estoque: parseInt(produto.estoqueAtual || 0), // CORRIGIDO
+                    nome: produto.nome,
+                    preco: parseFloat(produto.precoVenda || 0),
+                    estoque: parseInt(produto.estoqueAtual || 0),
                     imagemUrl: imagemUrl,
                     atualizado: new Date().toISOString()
                 });
                 produtosSalvos++;
             }
 
-            // Verifica paginação (baseado em meta ou se data vazio)
-            hasMore = dados.data.length > 0; // Ou use dados.meta se existir
+            hasMore = dados.data.length > 0;
             page++;
         }
 
@@ -51,6 +49,5 @@ exports.handler = async () => {
     } catch (error) {
         console.error("Erro:", error);
         return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
-    }
     }
 };
