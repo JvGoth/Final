@@ -4,7 +4,12 @@ const { getStore } = require("@netlify/blobs");
 
 exports.handler = async () => {
     try {
-        const store = getStore("produtos_bling");
+        // Modo manual
+        const store = getStore({
+            name: "produtos_bling",
+            siteID: process.env.NETLIFY_SITE_ID,
+            token: process.env.NETLIFY_API_TOKEN
+        });
         
         const listResult = await store.list();
         
