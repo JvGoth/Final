@@ -1,28 +1,17 @@
 // Arquivo: netlify/functions/sincronizar_bling.js
 
-const { getStore } = require("@netlify/blobs");
+import { getStore } from "@netlify/blobs";
 
-exports.handler = async () => {
+export default async () => {
     const accessToken = process.env.BLING_ACCESS_TOKEN;
     if (!accessToken) return { statusCode: 500, body: "Access Token Bling não configurado." };
 
-    const siteID = process.env.NETLIFY_SITE_ID;
-    const apiToken = process.env.NETLIFY_API_TOKEN;
-    if (!siteID || !apiToken) return { statusCode: 500, body: "NETLIFY_SITE_ID ou NETLIFY_API_TOKEN não configurados." };
-
-    console.log("Usando siteID:", siteID.substring(0, 8) + "...");
-    console.log("Usando token:", apiToken.substring(0, 8) + "...");
-
     try {
-        const store = getStore({
-            name: "produtos_bling",
-            siteID: siteID,
-            token: apiToken
-        });
+        const store = getStore("produtos_bling");
 
         // Teste inicial do Blobs
         await store.setJSON("test_key", { test: "valor" });
-        const testData = await store.get("test_key", { type: "json" });
+        const testData = await store.getJSON("test_key");
         console.log("Teste Blobs: ", testData ? "Sucesso" : "Falha");
         await store.delete("test_key");
 
@@ -73,4 +62,4 @@ exports.handler = async () => {
         console.error("Erro geral:", error);
         return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
     }
-};  
+};
