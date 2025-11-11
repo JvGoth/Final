@@ -10,8 +10,7 @@ exports.handler = async () => {
     const apiToken = process.env.NETLIFY_API_TOKEN;
     if (!siteID || !apiToken) return { statusCode: 500, body: "NETLIFY_SITE_ID ou NETLIFY_API_TOKEN não configurados." };
 
-    // Log para debug
-    console.log("Usando siteID:", siteID.substring(0, 8) + "..."); // Mostra parte para debug, sem expor todo
+    console.log("Usando siteID:", siteID.substring(0, 8) + "...");
     console.log("Usando token:", apiToken.substring(0, 8) + "...");
 
     try {
@@ -20,7 +19,13 @@ exports.handler = async () => {
             siteID: siteID,
             token: apiToken
         });
-        
+
+        // Teste inicial do Blobs: Tente set/get uma chave de teste
+        await store.setJSON("test_key", { test: "valor" });
+        const testData = await store.getJSON("test_key");
+        console.log("Teste Blobs: ", testData ? "Sucesso" : "Falha");
+        await store.delete("test_key"); // Limpa o teste
+
         let page = 1;
         let produtosSalvos = 0;
         let hasMore = true;
