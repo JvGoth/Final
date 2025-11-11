@@ -2,9 +2,7 @@
 
 import { getStore } from "@netlify/blobs";  // <--- ADICIONE ISSO AQUI
 
-// Remova esta linha duplicada e desnecessária: const store = getStore({ name: "produtos_bling", siteID: process.env.NETLIFY_SITE_ID, token: process.env.NETLIFY_API_TOKEN });
-
-exports.handler = async () => {
+export default async () => {
 exports.handler = async () => {
     const accessToken = process.env.BLING_ACCESS_TOKEN;
     if (!accessToken) return { statusCode: 500, body: "Access Token não configurado." };
