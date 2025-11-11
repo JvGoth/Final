@@ -4,13 +4,21 @@ const { getStore } = require("@netlify/blobs");
 
 exports.handler = async () => {
     const accessToken = process.env.BLING_ACCESS_TOKEN;
-    if (!accessToken) return { statusCode: 500, body: "Access Token não configurado." };
+    if (!accessToken) return { statusCode: 500, body: "Access Token Bling não configurado." };
+
+    const siteID = process.env.NETLIFY_SITE_ID;
+    const apiToken = process.env.NETLIFY_API_TOKEN;
+    if (!siteID || !apiToken) return { statusCode: 500, body: "NETLIFY_SITE_ID ou NETLIFY_API_TOKEN não configurados." };
+
+    // Log para debug
+    console.log("Usando siteID:", siteID.substring(0, 8) + "..."); // Mostra parte para debug, sem expor todo
+    console.log("Usando token:", apiToken.substring(0, 8) + "...");
 
     try {
         const store = getStore({
             name: "produtos_bling",
-            siteID: process.env.NETLIFY_SITE_ID,
-            token: process.env.NETLIFY_API_TOKEN
+            siteID: siteID,
+            token: apiToken
         });
         
         let page = 1;
@@ -25,7 +33,6 @@ exports.handler = async () => {
             });
             const dados = await response.json();
 
-            // Log para debug
             console.log(`Status da API Bling: ${response.status}`);
             if (dados.erros) console.log("Erros do Bling:", dados.erros);
 
