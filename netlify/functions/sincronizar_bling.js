@@ -7,7 +7,6 @@ exports.handler = async () => {
     if (!accessToken) return { statusCode: 500, body: "Access Token não configurado." };
 
     try {
-        // Modo manual usando env vars
         const store = getStore({
             name: "produtos_bling",
             siteID: process.env.NETLIFY_SITE_ID,
@@ -26,9 +25,12 @@ exports.handler = async () => {
             });
             const dados = await response.json();
 
+            // Log para debug
+            console.log(`Status da API Bling: ${response.status}`);
+            if (dados.erros) console.log("Erros do Bling:", dados.erros);
+
             if (!response.ok || !dados.data) {
-                console.error("Erro no Bling:", dados.erros || "Resposta inesperada");
-                return { statusCode: 500, body: JSON.stringify(dados.erros || "Erro") };
+                return { statusCode: 500, body: JSON.stringify(dados.erros || "Resposta inesperada do Bling") };
             }
 
             for (const produto of dados.data) {
@@ -50,10 +52,10 @@ exports.handler = async () => {
         }
 
         console.log(`Sincronizado: ${produtosSalvos} produtos.`);
-        return { statusCode: 200, body: "Sincronização concluída." };
+        return { statusCode: 200, body: "Sincronização concluída com sucesso." };
 
     } catch (error) {
-        console.error("Erro:", error);
+        console.error("Erro geral:", error);
         return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
     }
 };
