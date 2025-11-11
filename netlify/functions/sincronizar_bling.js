@@ -58,6 +58,7 @@ exports.handler = async () => {
                     atualizado: new Date().toISOString()
                 });
                 produtosSalvos++;
+                await new Promise(resolve => setTimeout(resolve, 100)); // Delay para evitar rate limit
             }
 
             hasMore = dados.data.length > 0;
@@ -72,4 +73,4 @@ exports.handler = async () => {
         console.error("Erro geral:", error);
         return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
     }
-};
+};  
