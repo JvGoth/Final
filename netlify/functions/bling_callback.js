@@ -1,6 +1,8 @@
-import { getStore } from "@netlify/blobs";
-const querystring = require("querystring"); // Ou import querystring from "querystring";
-const { Buffer } = require("buffer"); // Opcional, se necessário
+// Arquivo: netlify/functions/bling_callback.js
+
+const { getStore } = require("@netlify/blobs");
+const querystring = require("querystring");
+const { Buffer } = require("buffer");
 
 const CLIENT_ID = process.env.BLING_CLIENT_ID;
 const CLIENT_SECRET = process.env.BLING_CLIENT_SECRET;
