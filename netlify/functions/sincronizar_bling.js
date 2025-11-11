@@ -4,7 +4,10 @@ const { getStore } = require("@netlify/blobs");
 
 exports.handler = async () => {
     const accessToken = process.env.BLING_ACCESS_TOKEN;
-    if (!accessToken) return { statusCode: 500, body: "Access Token Bling não configurado." };
+    if (!accessToken) {
+        console.error("Access Token Bling não configurado.");
+        return { statusCode: 500, body: "Access Token Bling não configurado." };
+    }
 
     const siteID = process.env.NETLIFY_SITE_ID;
     const apiToken = process.env.NETLIFY_API_TOKEN;
@@ -19,6 +22,7 @@ exports.handler = async () => {
             siteID: siteID,
             token: apiToken
         });
+        console.log("Store inicializado com sucesso.");
 
         // Teste inicial do Blobs
         await store.setJSON("test_key", { test: "valor" });
@@ -29,7 +33,7 @@ exports.handler = async () => {
         let page = 1;
         let produtosSalvos = 0;
         let hasMore = true;
-        const maxPages = 5; // Limite para evitar timeout - aumente se background function
+        const maxPages = 5; // Limite para evitar timeout; ajuste se necessário
 
         while (hasMore && page <= maxPages) {
             const url = `https://api.bling.com.br/Api/v3/produtos?situacao=A&page=${page}&limit=100`;
@@ -37,10 +41,10 @@ exports.handler = async () => {
                 method: 'GET',
                 headers: { 'Authorization': `Bearer ${accessToken}`, 'Accept': 'application/json' }
             });
-            const dados = await response.json();
-
             console.log(`Status da API Bling (página ${page}): ${response.status}`);
-            if (dados.erros) console.log("Erros do Bling:", dados.erros);
+
+            const dados = await response.json();
+            if (dados.erros) console.log("Erros do Bling:", JSON.stringify(dados.erros));
 
             if (!response.ok || !dados.data) {
                 return { statusCode: 500, body: JSON.stringify(dados.erros || "Resposta inesperada do Bling") };
@@ -67,10 +71,10 @@ exports.handler = async () => {
 
         console.log(`Sincronizado: ${produtosSalvos} produtos (até página ${page - 1}).`);
         if (hasMore) console.log("Mais páginas disponíveis - rode novamente para continuar.");
-        return { statusCode: 200, body: "Sincronização parcial concluída. Produtos salvos: " + produtosSalvos };
+        return { statusCode: 200, body: `Sincronização parcial concluída. Produtos salvos: ${produtosSalvos}` };
 
     } catch (error) {
-        console.error("Erro geral:", error);
+        console.error("Erro geral em sincronizar_bling:", error.message, error.stack);
         return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
     }
-};  
+};
