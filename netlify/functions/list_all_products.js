@@ -4,7 +4,6 @@ const { getStore } = require("@netlify/blobs");
 
 exports.handler = async () => {
     try {
-        // Modo manual
         const store = getStore({
             name: "produtos_bling",
             siteID: process.env.NETLIFY_SITE_ID,
@@ -16,7 +15,7 @@ exports.handler = async () => {
         const products = {};
         
         for (const key of listResult.keys) {
-            const produtoDados = await store.getJSON(key);
+            const produtoDados = await store.get(key, { type: "json" }); // CORRIGIDO
             products[key] = produtoDados;
         }
 
