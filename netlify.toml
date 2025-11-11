@@ -1,11 +1,10 @@
 [build]
-  command = "npm install"  # Força instalação de dependências durante o build
-  functions = "netlify/functions"  # Caminho das functions
+  command = "npm install"  # Mantenha se necessário, ou mude para "npm run build" se tiver script
+  functions = "netlify/functions"  # OK, define pasta das funções
 
-[[functions]]
-  name = "sincronizar_bling"
-  path = "/.netlify/functions/sincronizar_bling"
-  background = true
+[functions.sincronizar_bling]  # Correto: Subseção para função específica (sem [[ ]])
+  background = true  # Ativa modo background (evita timeout de 10s)
 
-[[plugins]]
-  package = "@netlify/plugin-functions-install-core"  # Plugin para instalar deps em functions
+# Remova o plugin se não for essencial; teste sem ele primeiro
+# [[plugins]]
+#   package = "@netlify/plugin-functions-install-core"
