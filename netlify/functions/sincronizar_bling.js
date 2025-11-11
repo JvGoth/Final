@@ -20,17 +20,18 @@ exports.handler = async () => {
             token: apiToken
         });
 
-        // Teste inicial do Blobs: Tente set/get uma chave de teste
+        // Teste inicial do Blobs
         await store.setJSON("test_key", { test: "valor" });
-        const testData = await store.get("test_key", { type: "json" }); // CORRIGIDO: use get com type: "json"
+        const testData = await store.get("test_key", { type: "json" });
         console.log("Teste Blobs: ", testData ? "Sucesso" : "Falha");
-        await store.delete("test_key"); // Limpa o teste
+        await store.delete("test_key");
 
         let page = 1;
         let produtosSalvos = 0;
         let hasMore = true;
+        const maxPages = 5; // Limite para evitar timeout - aumente se background function
 
-        while (hasMore) {
+        while (hasMore && page <= maxPages) {
             const url = `https://api.bling.com.br/Api/v3/produtos?situacao=A&page=${page}&limit=100`;
             const response = await fetch(url, {
                 method: 'GET',
@@ -38,7 +39,7 @@ exports.handler = async () => {
             });
             const dados = await response.json();
 
-            console.log(`Status da API Bling: ${response.status}`);
+            console.log(`Status da API Bling (página ${page}): ${response.status}`);
             if (dados.erros) console.log("Erros do Bling:", dados.erros);
 
             if (!response.ok || !dados.data) {
@@ -63,8 +64,9 @@ exports.handler = async () => {
             page++;
         }
 
-        console.log(`Sincronizado: ${produtosSalvos} produtos.`);
-        return { statusCode: 200, body: "Sincronização concluída com sucesso." };
+        console.log(`Sincronizado: ${produtosSalvos} produtos (até página ${page - 1}).`);
+        if (hasMore) console.log("Mais páginas disponíveis - rode novamente para continuar.");
+        return { statusCode: 200, body: "Sincronização parcial concluída. Produtos salvos: " + produtosSalvos };
 
     } catch (error) {
         console.error("Erro geral:", error);
