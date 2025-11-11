@@ -1,6 +1,6 @@
 // Arquivo: netlify/functions/list_all_products.js (CORRIGIDO)
 
-const store = getStore({ name: "produtos_bling", siteID: process.env.NETLIFY_SITE_ID, token: process.env.NETLIFY_API_TOKEN });
+const { getStore } = require("@netlify/blobs");
 
 exports.handler = async () => {
     try {
@@ -36,3 +36,4 @@ exports.handler = async () => {
     }
 
 };
+
