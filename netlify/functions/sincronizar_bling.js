@@ -22,7 +22,7 @@ exports.handler = async () => {
 
         // Teste inicial do Blobs: Tente set/get uma chave de teste
         await store.setJSON("test_key", { test: "valor" });
-        const testData = await store.getJSON("test_key");
+        const testData = await store.get("test_key", { type: "json" }); // CORRIGIDO: use get com type: "json"
         console.log("Teste Blobs: ", testData ? "Sucesso" : "Falha");
         await store.delete("test_key"); // Limpa o teste
 
