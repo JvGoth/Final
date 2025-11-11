@@ -1,8 +1,8 @@
 // Arquivo: netlify/functions/bling_callback.js
 
-import { getStore } from "@netlify/blobs";
-import querystring from "querystring";
-import { Buffer } from "buffer";
+const { getStore } = require("@netlify/blobs");
+const querystring = require("querystring");
+const { Buffer } = require("buffer");
 
 const CLIENT_ID = process.env.BLING_CLIENT_ID;
 const CLIENT_SECRET = process.env.BLING_CLIENT_SECRET;
@@ -11,7 +11,7 @@ const REDIRECT_URI = 'https://miaupresentes.netlify.app/.netlify/functions/bling
 const credentials = `${CLIENT_ID}:${CLIENT_SECRET}`;
 const base64Credentials = Buffer.from(credentials).toString('base64');
 
-export default async (event) => {
+exports.handler = async (event) => {
     const code = event.queryStringParameters.code;
     if (!code) {
         return { statusCode: 400, body: "Erro: Código de autorização 'code' não encontrado na URL." };
@@ -45,7 +45,11 @@ export default async (event) => {
             return { statusCode: response.status, body: JSON.stringify(data) };
         }
 
-        const store = getStore("bling_tokens");
+        const store = getStore({
+            name: "bling_tokens",
+            siteID: process.env.NETLIFY_SITE_ID,
+            token: process.env.NETLIFY_API_TOKEN
+        });
         await store.setJSON("access_token", data);
 
         return {
@@ -53,6 +57,7 @@ export default async (event) => {
             body: JSON.stringify({ success: true, token: data.access_token })
         };
     } catch (error) {
+        console.error("Erro no callback:", error.message, error.stack);
         return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
     }
 };
