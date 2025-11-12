@@ -4,7 +4,3 @@
 
 [functions.sincronizar_bling]  # Correto: Subseção para função específica (sem [[ ]])
   background = true  # Ativa modo background (evita timeout de 10s)
-
-# Remova o plugin se não for essencial; teste sem ele primeiro
-# [[plugins]]
-#   package = "@netlify/plugin-functions-install-core"
