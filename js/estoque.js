@@ -67,15 +67,14 @@ async function atualizarDadosDosProdutos() {
                     }
                 }
 
-                // 4. DESABILITA ADD-TO-CART SE ESTOQUE <=0 (mantém o botão visível)
+                // 4. DESABILITA ADD-TO-CART SE ESTOQUE <=0, mas mantém texto 'Adicionar ao Carrinho'
                 if (buyButton) {
                     if (qtd <= 0) {
                         buyButton.disabled = true;
-                        buyButton.textContent = 'Esgotado';
                         buyButton.classList.add('disabled');
+                        // Mantém texto original, mas classe indica esgotado
                     } else {
                         buyButton.disabled = false;
-                        buyButton.textContent = 'Adicionar ao Carrinho';
                         buyButton.classList.remove('disabled');
                     }
                 }
@@ -90,7 +89,6 @@ async function atualizarDadosDosProdutos() {
                 const addToCartButton = card.querySelector('.add-to-cart');
                 if (addToCartButton) {
                     addToCartButton.disabled = true;
-                    addToCartButton.textContent = 'Indisponível';
                     addToCartButton.classList.add('disabled');
                 }
             }
