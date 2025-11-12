@@ -1,6 +1,8 @@
 // Arquivo: netlify/functions/sincronizar_bling.js
 
 const { getStore } = require("@netlify/blobs");
+const querystring = require("querystring");
+const { Buffer } = require("buffer"); // Adicionado para refresh
 
 async function refreshAccessToken(refresh_token) {
     const CLIENT_ID = process.env.BLING_CLIENT_ID;
@@ -31,32 +33,44 @@ async function refreshAccessToken(refresh_token) {
     }
 
     data.expires_at = Date.now() + (data.expires_in * 1000);
-    const store = getStore({ name: "bling_tokens" });
+    const store = getStore({
+        name: "bling_tokens",
+        siteID: process.env.NETLIFY_SITE_ID,
+        token: process.env.NETLIFY_API_TOKEN
+    });
     await store.setJSON("tokens", data);
     return data.access_token;
 }
 
 exports.handler = async () => {
-    const storeTokens = getStore({ name: "bling_tokens" });
+    const storeTokens = getStore({
+        name: "bling_tokens",
+        siteID: process.env.NETLIFY_SITE_ID,
+        token: process.env.NETLIFY_API_TOKEN
+    });
     let tokens = await storeTokens.get("tokens", { type: "json" });
 
     if (!tokens || !tokens.access_token) {
         return { statusCode: 500, body: JSON.stringify({ error: "Tokens não encontrados no Blob. Rode o callback primeiro." }) };
     }
 
-    // NOVO: Checa expiração e refresca se necessário
+    // Checa expiração e refresca se necessário
     if (Date.now() > tokens.expires_at) {
         try {
             tokens.access_token = await refreshAccessToken(tokens.refresh_token);
-            tokens = await storeTokens.get("tokens", { type: "json" }); // Recarrega após refresh
+            tokens = await storeTokens.get("tokens", { type: "json" }); // Recarrega
         } catch (error) {
-            return { statusCode: 500, body: JSON.stringify({ error: "Falha no refresh token: " + error.message }) };
+            return { statusCode: 500, body: JSON.stringify({ error: "Falha no refresh: " + error.message }) };
         }
     }
 
     const accessToken = tokens.access_token;
 
-    const storeProdutos = getStore({ name: "produtos_bling" });
+    const storeProdutos = getStore({
+        name: "produtos_bling",
+        siteID: process.env.NETLIFY_SITE_ID,
+        token: process.env.NETLIFY_API_TOKEN
+    });
 
     try {
         // Teste Blobs
@@ -74,9 +88,9 @@ exports.handler = async () => {
                 headers: { 'Authorization': `Bearer ${accessToken}`, 'Accept': 'application/json' }
             });
 
-            if (response.status === 401) { // NOVO: Se expirado durante loop, refresca
+            if (response.status === 401) { // Se expirado, refresca
                 tokens.access_token = await refreshAccessToken(tokens.refresh_token);
-                continue; // Retry a página
+                continue;
             }
 
             if (!response.ok) {
@@ -101,7 +115,7 @@ exports.handler = async () => {
                     atualizado: new Date().toISOString()
                 });
                 produtosSalvos++;
-                await new Promise(resolve => setTimeout(resolve, 500)); // Delay 0.5s para rate limits
+                await new Promise(resolve => setTimeout(resolve, 500)); // Delay para rates
             }
 
             page++;
