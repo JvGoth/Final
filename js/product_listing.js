@@ -20,7 +20,7 @@ function createProductCardHTML(id, produto) {
         buttonHTML = `
             <a href="https://wa.me/${whatsappNumber}?text=${whatsappMessage}" 
                class="whatsapp-buy-btn" target="_blank">
-                Comprar via WhatsApp
+                Comprar pelo WhatsApp
             </a>
         `;
     } else {
@@ -74,11 +74,13 @@ async function loadProductsFromBling() {
         let count = 0;
         for (const id in data) {
             const nomeLower = data[id].nome.toLowerCase();
-            // Filtro expandido para canecas.html: só mostra se contém 'caneca', 'garrafa' ou 'copo'
+            // Filtro para canecas.html: só mostra se contém 'caneca', 'garrafa' ou 'copo'
             if (window.location.pathname.includes('canecas.html') && 
-                !nomeLower.includes('caneca') && 
-                !nomeLower.includes('garrafa') && 
-                !nomeLower.includes('copo')) continue;
+                !(nomeLower.includes('caneca') || 
+                  nomeLower.includes('garrafa') || 
+                  nomeLower.includes('copo'))) {
+                continue;
+            }
             htmlContent += createProductCardHTML(id, data[id]);
             count++;
         }
