@@ -71,3 +71,7 @@ async function loadProductsFromBling() {
 }
 
 document.addEventListener('DOMContentLoaded', loadProductsFromBling);
+
+console.log('HTML gerado:', htmlContent);  // Mostra o HTML cru dos cards
+productListContainer.innerHTML = htmlContent;
+console.log('Cards inseridos no DOM. Quantidade:', productListContainer.children.length);  // Deve ser >0
