@@ -599,6 +599,25 @@ header h1 {
   color: #333;
 }
 
+/* Estilo para botão WhatsApp no carrinho */
+.whatsapp-cart-btn {
+    background-color: #25d366;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 10px;
+    transition: background-color 0.3s;
+}
+
+.whatsapp-cart-btn:hover {
+    background-color: #1ebe5d;
+}
+
 /* ===========================
    CARROSSEL CONSOLIDADO E CORRIGIDO (Final)
 =========================== */
@@ -823,6 +842,20 @@ p {
 
 .add-to-cart:hover {
   background: #dba67b;
+}
+
+/* Estilo para botões lado a lado nos cards */
+.product-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.product-buttons button,
+.product-buttons a {
+    flex: 1; /* Faz os botões ocuparem espaço igual */
+    text-align: center;
 }
 
 /* ===========================
