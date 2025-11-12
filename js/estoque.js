@@ -1,59 +1,60 @@
+// Arquivo: js/estoque.js
+
 // URL base para sua função de leitura de dados do produto
 const READ_DATA_URL = '/.netlify/functions/ler_dados_produto';
 
 /**
  * Função principal para buscar e atualizar o estoque e preço de todos os produtos na página.
- * Ela itera sobre todos os elementos com a classe .product-card.
+ * Ela itera sobre todos os elementos com a classe .product-card ou .carousel-item.
  */
 async function atualizarDadosDosProdutos() {
-    // Busca todos os cards que possuem o ID
+    // Busca todos os cards (do carrossel estático ou de listas de produtos estáticas)
     const productCards = document.querySelectorAll('.product-card, .carousel-item');
 
-    // Verifica se é a página de canecas
-    const isCanecasPage = window.location.pathname.includes('canecas.html');
-
     for (const card of productCards) {
-        // Assume que o ID está no data-id do cartão
         const idChave = card.dataset.id;
-
         if (!idChave) {
             continue;
         }
 
-        console.log(`Buscando ID: ${idChave}`); // CORRIGIDO: Movido para cá, com backticks e ponto-e-vírgula
+        console.log(`Buscando ID (estoque.js): ${idChave}`);
 
         try {
-            // 1. CHAMA A NETLIFY FUNCTION de forma segura, passando 'id'
-            const response = await fetch(`/.netlify/functions/ler_dados_produto?id=${idChave}`);
+            // 1. CHAMA A NETLIFY FUNCTION
+            const response = await fetch(`${READ_DATA_URL}?id=${idChave}`);
 
             if (response.ok) {
                 const dadosProduto = await response.json();
 
-                // 2. ATUALIZA O PREÇO
-                const priceElement = card.querySelector('.product-price') || card.querySelector('.price') || card.querySelector('strong'); // Adicionado 'strong' para o index.html
+                // 2. ATUALIZA O PREÇO (COM LÓGICA CORRIGIDA)
+                const priceElement = card.querySelector('.product-price') || card.querySelector('.price') || card.querySelector('strong');
                 if (priceElement) {
-                    priceElement.textContent = dadosProduto.preco.toLocaleString('pt-BR', {
-                        style: 'currency',
-                        currency: 'BRL'
-                    });
+                    const preco = dadosProduto.preco || 0;
+                    const precoFormatado = (preco > 0) ?
+                        preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) :
+                        'Consultar';
+                    
+                    priceElement.textContent = precoFormatado;
 
-                    // ATENÇÃO: Atualiza o data-price para que o cart.js possa funcionar (agora atualiza em todas as páginas, incluindo canecas.html)
+                    // Atualiza o data-price do botão do carrinho
                     const addToCartButton = card.querySelector('.add-to-cart');
                     if (addToCartButton) {
-                        addToCartButton.dataset.price = dadosProduto.preco;
+                        addToCartButton.dataset.price = preco; // Salva 0 ou o preço
                     }
                 }
 
                 // 3. ATUALIZA O ESTOQUE
-                let stockElement = card.querySelector('.stock') || card.querySelector('.estoque-info');
+                let stockElement = card.querySelector('.stock-info'); // Usando a classe definida no product_listing
+                if (!stockElement) {
+                    stockElement = card.querySelector('.stock') || card.querySelector('.estoque-info');
+                }
                 if (!stockElement) {
                     stockElement = document.createElement('p');
-                    stockElement.classList.add('stock');
-                    card.appendChild(stockElement); // Adiciona ao final do card
+                    stockElement.classList.add('stock-info'); // Mantém o padrão
+                    card.appendChild(stockElement);
                 }
 
                 const qtd = dadosProduto.estoque || 0;
-                const buyButton = card.querySelector('.add-to-cart'); // Apenas o add-to-cart (não altera whatsapp)
 
                 if (stockElement) {
                     if (qtd > 5) {
@@ -67,21 +68,21 @@ async function atualizarDadosDosProdutos() {
                     }
                 }
 
-                // REMOVIDO: Não desabilita mais o botão add-to-cart, mesmo se estoque <=0
-                // O botão permanece sempre habilitado
-
             } else {
-                console.warn(`Produto ID ${idChave} não encontrado no cache do Bling. Mantendo dados estáticos.`);
-                // Fallback: Define preço como "Consultar" e NÃO desabilita add-to-cart
+                console.warn(`Produto ID ${idChave} não encontrado no cache. Mantendo dados estáticos.`);
+                // Fallback: Define preço como "Consultar"
                 const priceElement = card.querySelector('.product-price') || card.querySelector('.price') || card.querySelector('strong');
                 if (priceElement) {
                     priceElement.textContent = 'Consultar';
                 }
-                // REMOVIDO: Não desabilita o botão add-to-cart no fallback
+                const addToCartButton = card.querySelector('.add-to-cart');
+                if (addToCartButton) {
+                    addToCartButton.dataset.price = 0; // Garante que o carrinho saiba que é 0
+                }
             }
 
         } catch (error) {
-            console.error(`Erro ao processar o ID ${idChave}:`, error);
+            console.error(`Erro ao processar o ID ${idChave} (estoque.js):`, error);
         }
     }
 }
