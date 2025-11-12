@@ -37,9 +37,9 @@ async function atualizarDadosDosProdutos() {
                         currency: 'BRL'
                     });
 
-                    // ATENÇÃO: Atualiza o data-price para que o cart.js possa funcionar (agora atualiza em todas as páginas, incluindo canecas.html)
+                    // ATENÇÃO: Atualiza o data-price para que o cart.js possa funcionar (mas ignora em canecas.html)
                     const addToCartButton = card.querySelector('.add-to-cart');
-                    if (addToCartButton) {
+                    if (addToCartButton && !isCanecasPage) {
                         addToCartButton.dataset.price = dadosProduto.preco;
                     }
                 }
@@ -53,44 +53,35 @@ async function atualizarDadosDosProdutos() {
                 }
 
                 const qtd = dadosProduto.estoque || 0;
-                const buyButton = card.querySelector('.add-to-cart'); // Apenas o add-to-cart (não altera whatsapp)
+                const buyButton = card.querySelector('.add-to-cart') || card.querySelector('.whatsapp-buy-btn');
 
                 if (stockElement) {
-                    if (qtd > 5) {
-                        stockElement.style.display = "none";
-                    } else if (qtd > 0) {
+                    if (qtd > 0 && qtd <= 5) {
                         stockElement.textContent = `⚠ Restam apenas ${qtd} unidades!`;
                         stockElement.style.display = "block";
+                    } else if (qtd > 5) {
+                        stockElement.style.display = "none";
                     } else {
-                        stockElement.textContent = `Esgotado`;
-                        stockElement.style.display = "block";
-                    }
-                }
-
-                // 4. DESABILITA ADD-TO-CART SE ESTOQUE <=0, mas mantém texto 'Adicionar ao Carrinho'
-                if (buyButton) {
-                    if (qtd <= 0) {
-                        buyButton.disabled = true;
-                        buyButton.classList.add('disabled');
-                        // Mantém texto original, mas classe indica esgotado
-                    } else {
-                        buyButton.disabled = false;
-                        buyButton.classList.remove('disabled');
+                        // Lógica para estoque 0: esconde mensagem e altera botão se necessário
+                        stockElement.style.display = "none";
+                        
+                        if (buyButton && buyButton.classList.contains('add-to-cart')) {
+                            // Para páginas normais: altera para WhatsApp se esgotado
+                            const whatsappMessage = encodeURIComponent(`Olá! Gostaria de comprar o produto: ${card.dataset.name}`);
+                            const whatsappNumber = '553599879068';
+                            buyButton.outerHTML = `
+                                <a href="https://wa.me/${whatsappNumber}?text=${whatsappMessage}" 
+                                   class="whatsapp-buy-btn" target="_blank">
+                                    Comprar pelo WhatsApp
+                                </a>
+                            `;
+                        }
                     }
                 }
 
             } else {
                 console.warn(`Produto ID ${idChave} não encontrado no cache do Bling. Mantendo dados estáticos.`);
-                // Fallback: Define preço como "Consultar" e desabilita add-to-cart
-                const priceElement = card.querySelector('.product-price') || card.querySelector('.price') || card.querySelector('strong');
-                if (priceElement) {
-                    priceElement.textContent = 'Consultar';
-                }
-                const addToCartButton = card.querySelector('.add-to-cart');
-                if (addToCartButton) {
-                    addToCartButton.disabled = true;
-                    addToCartButton.classList.add('disabled');
-                }
+                // Opcional: Se não encontrar, você pode desabilitar o botão de compra
             }
 
         } catch (error) {
