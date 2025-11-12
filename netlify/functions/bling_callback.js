@@ -16,17 +16,29 @@ exports.handler = async (event) => {
     const code = params.code;
     const error = params.error;
     const errorDescription = params.error_description;
+    const receivedState = params.state;
+
+    const store = getStore({ name: "bling_tokens" });
+    const storedState = await store.get("state");
 
     if (error) {
-        return { statusCode: 400, body: JSON.stringify({ bling_error: error, description: errorDescription || 'Sem descrição adicional.' }) };
+        await store.delete("state"); // Limpa
+        return { statusCode: 400, body: JSON.stringify({ bling_error: error, description: errorDescription || 'Sem descrição.' }) };
     }
 
+    if (!receivedState || receivedState !== storedState) {
+        await store.delete("state");
+        return { statusCode: 400, body: JSON.stringify({ error: "State ausente ou não corresponde (proteção CSRF)." }) };
+    }
+
+    await store.delete("state"); // Limpa após verificação
+
     if (!code) {
-        return { statusCode: 400, body: JSON.stringify({ error: "Código de autorização 'code' não encontrado na URL. Verifique se aprovou a autorização no Bling." }) };
+        return { statusCode: 400, body: JSON.stringify({ error: "Código de autorização 'code' não encontrado." }) };
     }
 
     if (!CLIENT_ID || !CLIENT_SECRET) {
-        return { statusCode: 500, body: JSON.stringify({ error: "Variáveis CLIENT_ID ou CLIENT_SECRET não configuradas." }) };
+        return { statusCode: 500, body: JSON.stringify({ error: "CLIENT_ID ou CLIENT_SECRET não configurados." }) };
     }
 
     const postBody = querystring.stringify({
@@ -56,7 +68,6 @@ exports.handler = async (event) => {
 
         data.expires_at = Date.now() + (data.expires_in * 1000);
 
-        const store = getStore({ name: "bling_tokens" });
         await store.setJSON("tokens", data);
 
         return {
