@@ -101,15 +101,6 @@ async function loadProductsFromBling() {
                 // --- LOG DE DEBUG CRÍTICO 3 ---
                 console.log(`Preço de ${data[id].nome} (ID ${id}): ${data[id].preco}`);
             }
-            
-            // Lógica de filtro para canecas.html
-            const nomeLower = data[id].nome.toLowerCase();
-            if (window.location.pathname.includes('canecas.html') &&
-                !(nomeLower.includes('caneca') ||
-                    nomeLower.includes('garrafa') ||
-                    nomeLower.includes('copo'))) {
-                continue;
-            }
 
             htmlContent += createProductCardHTML(id, data[id]);
             count++;
@@ -124,4 +115,5 @@ async function loadProductsFromBling() {
 }
 
 document.addEventListener('DOMContentLoaded', loadProductsFromBling);
+
 
