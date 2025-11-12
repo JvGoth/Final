@@ -9,17 +9,38 @@ function createProductCardHTML(id, produto) {
                            new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(produto.preco) : 
                            'R$ --,--';
     
+    // Verifica se é a página de canecas para customizar o botão
+    const isCanecasPage = window.location.pathname.includes('canecas.html');
+    let buttonHTML;
+    
+    if (isCanecasPage) {
+        // Botão que leva ao WhatsApp em vez de adicionar ao carrinho
+        const whatsappMessage = encodeURIComponent(`Olá! Gostaria de comprar o produto: ${produto.nome}`);
+        const whatsappNumber = '553599879068'; // Número do WhatsApp da loja
+        buttonHTML = `
+            <a href="https://wa.me/${whatsappNumber}?text=${whatsappMessage}" 
+               class="whatsapp-buy-btn" target="_blank">
+                Comprar via WhatsApp
+            </a>
+        `;
+    } else {
+        // Botão padrão de adicionar ao carrinho
+        buttonHTML = `
+            <button class="add-to-cart" 
+                    data-name="${produto.nome}" 
+                    data-price="${produto.preco || 0}">
+                Adicionar ao Carrinho
+            </button>
+        `;
+    }
+    
     return `
         <div class="product-card fade-in" data-id="${id}" data-name="${produto.nome}">
             <img src="${imageUrl}" alt="${produto.nome}">
             <h3>${produto.nome}</h3>
             <strong data-price>${precoFormatado}</strong>
             <p class="stock-info" data-stock-status style="display: none;"></p>
-            <button class="add-to-cart" 
-                    data-name="${produto.nome}" 
-                    data-price="${produto.preco || 0}">
-                Adicionar ao Carrinho
-            </button>
+            ${buttonHTML}
         </div>
     `;
 }
@@ -52,7 +73,12 @@ async function loadProductsFromBling() {
         let htmlContent = '';
         let count = 0;
         for (const id in data) {
-            if (window.location.pathname.includes('canecas.html') && !data[id].nome.toLowerCase().includes('caneca')) continue;
+            const nomeLower = data[id].nome.toLowerCase();
+            // Filtro expandido para canecas.html: só mostra se contém 'caneca', 'garrafa' ou 'copo'
+            if (window.location.pathname.includes('canecas.html') && 
+                !nomeLower.includes('caneca') && 
+                !nomeLower.includes('garrafa') && 
+                !nomeLower.includes('copo')) continue;
             htmlContent += createProductCardHTML(id, data[id]);
             count++;
         }
@@ -71,7 +97,3 @@ async function loadProductsFromBling() {
 }
 
 document.addEventListener('DOMContentLoaded', loadProductsFromBling);
-
-console.log('HTML gerado:', htmlContent);  // Mostra o HTML cru dos cards
-productListContainer.innerHTML = htmlContent;
-console.log('Cards inseridos no DOM. Quantidade:', productListContainer.children.length);  // Deve ser >0
