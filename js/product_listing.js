@@ -9,30 +9,8 @@ function createProductCardHTML(id, produto) {
                            new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(produto.preco) : 
                            'R$ --,--';
     
-    // Verifica se é a página de canecas para customizar o botão
-    const isCanecasPage = window.location.pathname.includes('canecas.html');
-    let buttonHTML;
-    
-    if (isCanecasPage) {
-        // Botão que leva ao WhatsApp em vez de adicionar ao carrinho
-        const whatsappMessage = encodeURIComponent(`Olá! Gostaria de comprar o produto: ${produto.nome}`);
-        const whatsappNumber = '553599879068'; // Número do WhatsApp da loja
-        buttonHTML = `
-            <a href="https://wa.me/${whatsappNumber}?text=${whatsappMessage}" 
-               class="whatsapp-buy-btn" target="_blank">
-                Comprar pelo WhatsApp
-            </a>
-        `;
-    } else {
-        // Botão padrão de adicionar ao carrinho
-        buttonHTML = `
-            <button class="add-to-cart" 
-                    data-name="${produto.nome}" 
-                    data-price="${produto.preco || 0}">
-                Adicionar ao Carrinho
-            </button>
-        `;
-    }
+    const whatsappMessage = encodeURIComponent(`Olá! Gostaria de comprar o produto: ${produto.nome}`);
+    const whatsappNumber = '553599879068'; // Número do WhatsApp da loja
     
     return `
         <div class="product-card fade-in" data-id="${id}" data-name="${produto.nome}">
@@ -40,7 +18,17 @@ function createProductCardHTML(id, produto) {
             <h3>${produto.nome}</h3>
             <strong data-price>${precoFormatado}</strong>
             <p class="stock-info" data-stock-status style="display: none;"></p>
-            ${buttonHTML}
+            <div class="product-buttons">
+                <button class="add-to-cart" 
+                        data-name="${produto.nome}" 
+                        data-price="${produto.preco || 0}">
+                    Adicionar ao Carrinho
+                </button>
+                <a href="https://wa.me/${whatsappNumber}?text=${whatsappMessage}" 
+                   class="whatsapp-buy-btn" target="_blank">
+                    Comprar pelo WhatsApp
+                </a>
+            </div>
         </div>
     `;
 }
@@ -79,6 +67,7 @@ async function loadProductsFromBling() {
                 !(nomeLower.includes('caneca') || 
                   nomeLower.includes('garrafa') || 
                   nomeLower.includes('copo'))) {
+                console.log('Produto pulado pelo filtro:', nomeLower);  // Log para depurar filtro
                 continue;
             }
             htmlContent += createProductCardHTML(id, data[id]);
