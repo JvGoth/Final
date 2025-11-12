@@ -1,6 +1,3 @@
 [build]
   command = "npm install"  # Mantenha se necessário, ou mude para "npm run build" se tiver script
   functions = "netlify/functions"  # OK, define pasta das funções
-
-[functions.sincronizar_bling]  # Correto: Subseção para função específica (sem [[ ]])
-  background = true  # Ativa modo background (evita timeout de 10s)
