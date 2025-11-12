@@ -3,37 +3,22 @@
 const { getStore } = require("@netlify/blobs");
 
 exports.handler = async (event) => {
-  const idChave = event.queryStringParameters.id; 
-
-  if (!idChave) {
-    return {
-        statusCode: 400,
-        body: JSON.stringify({ error: 'Parâmetro id ausente.' })
-    };
-  }
-
-  try {
-    const store = getStore("produtos_bling");
-    
-    const produtoDados = await store.get(idChave, { type: "json" }); 
-
-    if (produtoDados) { 
-      return {
-        statusCode: 200,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(produtoDados), 
-      };
-    } else {
-      return {
-        statusCode: 404,
-        body: JSON.stringify({ error: "Produto não encontrado ou ainda não sincronizado." }),
-      };
+    const idChave = event.queryStringParameters.id;
+    if (!idChave) {
+        return { statusCode: 400, body: JSON.stringify({ error: 'Parâmetro id ausente.' }) };
     }
-  } catch (error) {
-    console.error("Erro ao ler dados do Blob:", error.message, error.stack);
-    return { 
-        statusCode: 500, 
-        body: JSON.stringify({ error: "Erro interno no servidor." }) 
-    };
-  }
+
+    try {
+        const store = getStore({ name: "produtos_bling" });
+        const produtoDados = await store.get(idChave, { type: "json" });
+
+        if (produtoDados) {
+            return { statusCode: 200, body: JSON.stringify(produtoDados) };
+        } else {
+            return { statusCode: 404, body: JSON.stringify({ error: "Produto não encontrado." }) };
+        }
+    } catch (error) {
+        console.error("Erro ao ler Blob:", error.message, error.stack);
+        return { statusCode: 500, body: JSON.stringify({ error: "Erro interno." }) };
+    }
 };
