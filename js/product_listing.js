@@ -1,7 +1,7 @@
-// Arquivo: js/product_listing.js (Versão Final)
+// Arquivo: js/product_listing.js
 
 const LIST_ALL_URL = '/.netlify/functions/list_all_products'; 
-const DEFAULT_IMAGE = 'imagens/default.jpg'; // Altere para o caminho da sua imagem padrão
+const DEFAULT_IMAGE = 'imagens/default.jpg';
 
 function createProductCardHTML(id, produto) {
     const imageUrl = produto.imagemUrl || DEFAULT_IMAGE;
@@ -10,8 +10,8 @@ function createProductCardHTML(id, produto) {
                            'R$ --,--';
     
     return `
-        <div class="product-card fade-in" data-id="$$ {id}" data-name=" $${produto.nome}">
-            <img src="$$ {imageUrl}" alt=" $${produto.nome}">
+        <div class="product-card fade-in" data-id="${id}" data-name="${produto.nome}">
+            <img src="${imageUrl}" alt="${produto.nome}">
             <h3>${produto.nome}</h3>
             <strong data-price>${precoFormatado}</strong>
             <p class="stock-info" data-stock-status style="display: none;"></p>
@@ -26,37 +26,39 @@ function createProductCardHTML(id, produto) {
 
 async function loadProductsFromBling() {
     const productListContainer = document.querySelector('.product-list');
-    if (!productListContainer) return; 
+    if (!productListContainer) {
+        console.error('Container .product-list não encontrado no HTML.');
+        return;
+    }
 
     productListContainer.innerHTML = '<h2>Carregando produtos...</h2>';
     
     try {
         const response = await fetch(LIST_ALL_URL);
-        console.log('Resposta do fetch:', response.status);  // Log: Veja no console do browser
+        console.log('Resposta do fetch:', response.status, response.statusText);  // Log detalhado
         if (!response.ok) {
-            throw new Error(`Erro HTTP: ${response.status}`);
+            throw new Error(`Erro HTTP: ${response.status} - ${await response.text()}`);
         }
         const data = await response.json();
-        console.log('Dados recebidos:', data);  // Log: Veja se vazio ou com produtos
+        console.log('Dados recebidos completos:', data);  // Log: Veja se vazio ou com erro
 
         productListContainer.innerHTML = ''; 
 
         if (data.error) {
-            productListContainer.innerHTML = '<h2>Erro ao carregar produtos. Tente mais tarde.</h2>';
+            productListContainer.innerHTML = '<h2>Erro ao carregar produtos: ' + data.error + '</h2>';
             return;
         }
 
         let htmlContent = '';
         let count = 0;
         for (const id in data) {
-            // Filtro só para canecas.html
             if (window.location.pathname.includes('canecas.html') && !data[id].nome.toLowerCase().includes('caneca')) continue;
             htmlContent += createProductCardHTML(id, data[id]);
             count++;
         }
-        console.log(`Gerados ${count} cards de produtos.`);  // Log: Quantos mostrados
+        console.log(`Gerados ${count} cards de produtos.`); 
         
-        productListContainer.innerHTML = htmlContent;
+        productListContainer.innerHTML = htmlContent || '<h2>Nenhum produto disponível no momento.</h2>';  // Mensagem se vazio
         
         if (typeof atualizarDadosDosProdutos === 'function') {
             atualizarDadosDosProdutos();
@@ -64,7 +66,7 @@ async function loadProductsFromBling() {
 
     } catch (error) {
         console.error("Erro na listagem de produtos:", error);
-        productListContainer.innerHTML = '<h2>Não foi possível conectar ao banco de dados.</h2>';
+        productListContainer.innerHTML = '<h2>Não foi possível conectar ao banco de dados: ' + error.message + '</h2>';
     }
 }
 
