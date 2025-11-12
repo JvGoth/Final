@@ -1,4 +1,4 @@
-// Arquivo: netlify/functions/sincronizar_bling-background.js  // NOTE: Renomeado com -background para forçar modo async (15 min timeout)
+// Arquivo: netlify/functions/sincronizar_bling-background.js
 
 const { getStore } = require("@netlify/blobs");
 const querystring = require("querystring");
@@ -38,7 +38,7 @@ async function refreshAccessToken(refresh_token) {
     const store = getStore({
         name: "bling_tokens",
         siteID: process.env.NETLIFY_SITE_ID,
-        token: process.env.NETLIFY_API_TOKEN
+        token: process.env.NETLIFY_AUTH_TOKEN  // ALTERADO: Use AUTH_TOKEN
     });
     await store.setJSON("tokens", data);
     console.log("Refresh concluído com sucesso.");
@@ -50,7 +50,7 @@ exports.handler = async () => {
     const storeTokens = getStore({
         name: "bling_tokens",
         siteID: process.env.NETLIFY_SITE_ID,
-        token: process.env.NETLIFY_API_TOKEN
+        token: process.env.NETLIFY_AUTH_TOKEN  // ALTERADO
     });
     let tokens = await storeTokens.get("tokens", { type: "json" });
 
@@ -76,7 +76,7 @@ exports.handler = async () => {
     const storeProdutos = getStore({
         name: "produtos_bling",
         siteID: process.env.NETLIFY_SITE_ID,
-        token: process.env.NETLIFY_API_TOKEN
+        token: process.env.NETLIFY_AUTH_TOKEN  // ALTERADO
     });
 
     try {
@@ -123,15 +123,21 @@ exports.handler = async () => {
                 const idChave = produto.id.toString();
                 const imagemUrl = produto.imagens?.[0]?.link || null;
 
-                await storeProdutos.setJSON(idChave, {
-                    nome: produto.nome,
-                    preco: parseFloat(produto.precoVenda || 0),
-                    estoque: parseInt(produto.estoqueAtual || 0),
-                    imagemUrl: imagemUrl,
-                    atualizado: new Date().toISOString()
-                });
-                produtosSalvos++;
-                await new Promise(resolve => setTimeout(resolve, 200)); // Reduzido para 200ms para acelerar sem bater rates
+                try {
+                    await storeProdutos.setJSON(idChave, {
+                        nome: produto.nome,
+                        preco: parseFloat(produto.precoVenda || 0),
+                        estoque: parseInt(produto.estoqueAtual || 0),
+                        imagemUrl: imagemUrl,
+                        atualizado: new Date().toISOString()
+                    });
+                    produtosSalvos++;
+                    console.log(`Produto ${idChave} salvo com sucesso.`);
+                } catch (setError) {
+                    console.error(`Erro ao salvar produto ID ${idChave}:`, setError.message, setError.stack);
+                    // Continua
+                }
+                await new Promise(resolve => setTimeout(resolve, 2000)); // Aumentado para 2s para evitar 401
             }
 
             console.log(`Página ${page} completa. Produtos salvos até agora: ${produtosSalvos}`);
