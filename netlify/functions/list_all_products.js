@@ -4,9 +4,6 @@ const { getStore, listStores } = require("@netlify/blobs");  // Adicionado listS
 
 exports.handler = async () => {
     try {
-        // NOVO: Lista todos os stores para debug
-        const { stores } = await listStores();
-        console.log('Stores disponíveis:', stores.join(', '));  // Log: Veja se "produtos_bling" existe
 
         const store = getStore({
             name: "produtos_bling",
@@ -37,3 +34,4 @@ exports.handler = async () => {
         return { statusCode: 500, body: JSON.stringify({ error: "Erro ao listar produtos." }) };
     }
 };
+
