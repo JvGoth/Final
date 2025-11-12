@@ -126,8 +126,8 @@ exports.handler = async () => {
                 try {
                     await storeProdutos.setJSON(idChave, {
                         nome: produto.nome,
-                        preco: parseFloat(produto.precoVenda || 0),
-                        estoque: parseInt(produto.estoqueAtual || 0),
+                        preco: parseFloat(produto.precos?.[0]?.preco || 0),
+                        estoque: parseInt(produto.estoques?.[0]?.saldo || 0),
                         imagemUrl: imagemUrl,
                         atualizado: new Date().toISOString()
                     });
