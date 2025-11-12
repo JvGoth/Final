@@ -5,9 +5,9 @@ const { getStore } = require("@netlify/blobs");
 exports.handler = async () => {
     try {
         const store = getStore({
-            name: "produtos_bling",
+            name: "seu_name",
             siteID: process.env.NETLIFY_SITE_ID,
-            token: process.env.NETLIFY_API_TOKEN
+            token: process.env.NETLIFY_AUTH_TOKEN
         });
         const listResult = await store.list();
         
@@ -25,3 +25,4 @@ exports.handler = async () => {
         return { statusCode: 500, body: JSON.stringify({ error: "Erro ao listar produtos." }) };
     }
 };
+
