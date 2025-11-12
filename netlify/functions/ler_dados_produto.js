@@ -10,11 +10,12 @@ exports.handler = async (event) => {
 
     try {
         const store = getStore({
-            name: "seu_name",
+            name: "produtos_bling",
             siteID: process.env.NETLIFY_SITE_ID,
             token: process.env.NETLIFY_AUTH_TOKEN
         });
         const produtoDados = await store.get(idChave, { type: "json" });
+        console.log(`Buscando ID ${idChave}: ${produtoDados ? 'Encontrado' : 'Não encontrado'}`);  // Log novo
 
         if (produtoDados) {
             return { statusCode: 200, body: JSON.stringify(produtoDados) };
