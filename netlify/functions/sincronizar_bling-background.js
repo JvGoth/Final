@@ -1,10 +1,11 @@
-// Arquivo: netlify/functions/sincronizar_bling.js
+// Arquivo: netlify/functions/sincronizar_bling-background.js  // NOTE: Renomeado com -background para forçar modo async (15 min timeout)
 
 const { getStore } = require("@netlify/blobs");
 const querystring = require("querystring");
-const { Buffer } = require("buffer"); // Adicionado para refresh
+const { Buffer } = require("buffer");
 
 async function refreshAccessToken(refresh_token) {
+    console.log("Iniciando refresh de token...");
     const CLIENT_ID = process.env.BLING_CLIENT_ID;
     const CLIENT_SECRET = process.env.BLING_CLIENT_SECRET;
     const credentials = `${CLIENT_ID}:${CLIENT_SECRET}`;
@@ -29,6 +30,7 @@ async function refreshAccessToken(refresh_token) {
 
     const data = await response.json();
     if (!response.ok) {
+        console.error("Refresh falhou:", JSON.stringify(data));
         throw new Error(`Refresh falhou: ${JSON.stringify(data)}`);
     }
 
@@ -39,10 +41,12 @@ async function refreshAccessToken(refresh_token) {
         token: process.env.NETLIFY_API_TOKEN
     });
     await store.setJSON("tokens", data);
+    console.log("Refresh concluído com sucesso.");
     return data.access_token;
 }
 
 exports.handler = async () => {
+    console.log("Iniciando sincronização... Verificando tokens.");
     const storeTokens = getStore({
         name: "bling_tokens",
         siteID: process.env.NETLIFY_SITE_ID,
@@ -51,20 +55,23 @@ exports.handler = async () => {
     let tokens = await storeTokens.get("tokens", { type: "json" });
 
     if (!tokens || !tokens.access_token) {
+        console.error("Tokens não encontrados.");
         return { statusCode: 500, body: JSON.stringify({ error: "Tokens não encontrados no Blob. Rode o callback primeiro." }) };
     }
 
-    // Checa expiração e refresca se necessário
     if (Date.now() > tokens.expires_at) {
+        console.log("Token expirado, refreshing...");
         try {
             tokens.access_token = await refreshAccessToken(tokens.refresh_token);
-            tokens = await storeTokens.get("tokens", { type: "json" }); // Recarrega
+            tokens = await storeTokens.get("tokens", { type: "json" });
         } catch (error) {
+            console.error("Falha no refresh:", error.message);
             return { statusCode: 500, body: JSON.stringify({ error: "Falha no refresh: " + error.message }) };
         }
     }
 
     const accessToken = tokens.access_token;
+    console.log("Token válido. Iniciando sync de produtos.");
 
     const storeProdutos = getStore({
         name: "produtos_bling",
@@ -73,36 +80,45 @@ exports.handler = async () => {
     });
 
     try {
-        // Teste Blobs
+        console.log("Testando Blobs...");
         await storeProdutos.setJSON("test_key", { test: "valor" });
         await storeProdutos.delete("test_key");
+        console.log("Teste Blobs OK.");
 
         let page = 1;
         let produtosSalvos = 0;
         let hasMore = true;
 
         while (hasMore) {
+            console.log(`Buscando página ${page}...`);
             const url = `https://api.bling.com.br/Api/v3/produtos?situacao=A&page=${page}&limit=100`;
             const response = await fetch(url, {
                 method: 'GET',
                 headers: { 'Authorization': `Bearer ${accessToken}`, 'Accept': 'application/json' }
             });
 
-            if (response.status === 401) { // Se expirado, refresca
+            console.log(`Status da resposta Bling (página ${page}): ${response.status}`);
+
+            if (response.status === 401) {
+                console.log("401 detectado, refreshing token...");
                 tokens.access_token = await refreshAccessToken(tokens.refresh_token);
                 continue;
             }
 
             if (!response.ok) {
-                return { statusCode: 500, body: JSON.stringify(await response.json()) };
+                const erroData = await response.json();
+                console.error("Erro na API Bling:", JSON.stringify(erroData));
+                return { statusCode: 500, body: JSON.stringify(erroData) };
             }
 
             const dados = await response.json();
             if (!dados.data || dados.data.length === 0) {
+                console.log("Não há mais dados. Finalizando.");
                 hasMore = false;
                 break;
             }
 
+            console.log(`Processando ${dados.data.length} produtos na página ${page}...`);
             for (const produto of dados.data) {
                 const idChave = produto.id.toString();
                 const imagemUrl = produto.imagens?.[0]?.link || null;
@@ -115,15 +131,17 @@ exports.handler = async () => {
                     atualizado: new Date().toISOString()
                 });
                 produtosSalvos++;
-                await new Promise(resolve => setTimeout(resolve, 500)); // Delay para rates
+                await new Promise(resolve => setTimeout(resolve, 200)); // Reduzido para 200ms para acelerar sem bater rates
             }
 
+            console.log(`Página ${page} completa. Produtos salvos até agora: ${produtosSalvos}`);
             page++;
         }
 
+        console.log(`Sincronização concluída! Total produtos: ${produtosSalvos}`);
         return { statusCode: 200, body: `Sincronização concluída. Produtos salvos: ${produtosSalvos}` };
     } catch (error) {
-        console.error("Erro em sincronizar_bling:", error.message, error.stack);
+        console.error("Erro geral em sync:", error.message, error.stack);
         return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
     }
 };
