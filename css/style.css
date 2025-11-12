@@ -838,11 +838,11 @@ p {
 }
 /* Estilo para botões lado a lado nos cards, centralizados */
 .product-buttons {
-    display: flex;
-    justify-content: center; /* Centraliza os botões horizontalmente */
-    gap: 10px;
-    margin-top: 10px;
-    width: 100%; /* Ocupa toda largura do card para centralização */
+   display: flex;
+   flex-direction: column; /* Um em cima do outro */
+   gap: 10px; /* Espaço entre os botões */
+   margin-top: 10px;
+   width: 100%; /* Ocupa toda a largura do card */
 }
 .product-buttons button,
 .product-buttons a {
@@ -1131,5 +1131,6 @@ form button:hover {
   opacity: 1;
   transform: translateY(0);
 }
+
 
 
