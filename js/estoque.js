@@ -1,14 +1,8 @@
 // Arquivo: js/estoque.js
 
-// URL base para sua função de leitura de dados do produto
 const READ_DATA_URL = '/.netlify/functions/ler_dados_produto';
 
-/**
- * Função principal para buscar e atualizar o estoque e preço de todos os produtos na página.
- * Ela itera sobre todos os elementos com a classe .product-card ou .carousel-item.
- */
 async function atualizarDadosDosProdutos() {
-    // Busca todos os cards (do carrossel estático ou de listas de produtos estáticas)
     const productCards = document.querySelectorAll('.product-card, .carousel-item');
 
     for (const card of productCards) {
@@ -20,37 +14,37 @@ async function atualizarDadosDosProdutos() {
         console.log(`Buscando ID (estoque.js): ${idChave}`);
 
         try {
-            // 1. CHAMA A NETLIFY FUNCTION
             const response = await fetch(`${READ_DATA_URL}?id=${idChave}`);
 
             if (response.ok) {
                 const dadosProduto = await response.json();
 
-                // 2. ATUALIZA O PREÇO (COM LÓGICA CORRIGIDA)
+                // --- ATUALIZA O PREÇO (MODIFICADO) ---
                 const priceElement = card.querySelector('.product-price') || card.querySelector('.price') || card.querySelector('strong');
                 if (priceElement) {
                     const preco = dadosProduto.preco || 0;
-                    const precoFormatado = (preco > 0) ?
-                        preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) :
-                        'Consultar';
+                    // REMOVIDA A CONDIÇÃO (preco > 0). Sempre formata.
+                    const precoFormatado = preco.toLocaleString('pt-BR', { 
+                        style: 'currency', 
+                        currency: 'BRL' 
+                    });
                     
                     priceElement.textContent = precoFormatado;
 
-                    // Atualiza o data-price do botão do carrinho
                     const addToCartButton = card.querySelector('.add-to-cart');
                     if (addToCartButton) {
-                        addToCartButton.dataset.price = preco; // Salva 0 ou o preço
+                        addToCartButton.dataset.price = preco; 
                     }
                 }
 
-                // 3. ATUALIZA O ESTOQUE
-                let stockElement = card.querySelector('.stock-info'); // Usando a classe definida no product_listing
+                // --- ATUALIZA O ESTOQUE (MODIFICADO) ---
+                let stockElement = card.querySelector('.stock-info'); 
                 if (!stockElement) {
                     stockElement = card.querySelector('.stock') || card.querySelector('.estoque-info');
                 }
                 if (!stockElement) {
                     stockElement = document.createElement('p');
-                    stockElement.classList.add('stock-info'); // Mantém o padrão
+                    stockElement.classList.add('stock-info');
                     card.appendChild(stockElement);
                 }
 
@@ -58,26 +52,32 @@ async function atualizarDadosDosProdutos() {
 
                 if (stockElement) {
                     if (qtd > 5) {
-                        stockElement.style.display = "none";
+                        // MUDANÇA: Exibe estoque alto
+                        stockElement.textContent = `Em estoque (${qtd})`;
+                        stockElement.style.display = "block";
+                        stockElement.style.color = "#4CAF50"; // Verde
                     } else if (qtd > 0) {
                         stockElement.textContent = `⚠ Restam apenas ${qtd} unidades!`;
                         stockElement.style.display = "block";
+                        stockElement.style.color = ""; // Cor padrão
                     } else {
                         stockElement.textContent = `Esgotado`;
                         stockElement.style.display = "block";
+                        stockElement.style.color = ""; // Cor padrão
                     }
                 }
 
             } else {
                 console.warn(`Produto ID ${idChave} não encontrado no cache. Mantendo dados estáticos.`);
-                // Fallback: Define preço como "Consultar"
+                // Fallback (MODIFICADO)
                 const priceElement = card.querySelector('.product-price') || card.querySelector('.price') || card.querySelector('strong');
                 if (priceElement) {
-                    priceElement.textContent = 'Consultar';
+                    // Mostra R$ 0,00 em vez de "Consultar"
+                    priceElement.textContent = (0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                 }
                 const addToCartButton = card.querySelector('.add-to-cart');
                 if (addToCartButton) {
-                    addToCartButton.dataset.price = 0; // Garante que o carrinho saiba que é 0
+                    addToCartButton.dataset.price = 0;
                 }
             }
 
@@ -87,5 +87,4 @@ async function atualizarDadosDosProdutos() {
     }
 }
 
-// Garante que a função rode após a página carregar
 document.addEventListener("DOMContentLoaded", atualizarDadosDosProdutos);
