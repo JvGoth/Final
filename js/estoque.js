@@ -37,9 +37,9 @@ async function atualizarDadosDosProdutos() {
                         currency: 'BRL'
                     });
 
-                    // ATENÇÃO: Atualiza o data-price para que o cart.js possa funcionar (mas ignora em canecas.html)
+                    // ATENÇÃO: Atualiza o data-price para que o cart.js possa funcionar (agora atualiza em todas as páginas, incluindo canecas.html)
                     const addToCartButton = card.querySelector('.add-to-cart');
-                    if (addToCartButton && !isCanecasPage) {
+                    if (addToCartButton) {
                         addToCartButton.dataset.price = dadosProduto.preco;
                     }
                 }
@@ -53,35 +53,31 @@ async function atualizarDadosDosProdutos() {
                 }
 
                 const qtd = dadosProduto.estoque || 0;
-                const buyButton = card.querySelector('.add-to-cart') || card.querySelector('.whatsapp-buy-btn');
+                const buyButton = card.querySelector('.add-to-cart'); // Apenas o add-to-cart (não altera whatsapp)
 
                 if (stockElement) {
-                    if (qtd > 0 && qtd <= 5) {
+                    if (qtd > 5) {
+                        stockElement.style.display = "none";
+                    } else if (qtd > 0) {
                         stockElement.textContent = `⚠ Restam apenas ${qtd} unidades!`;
                         stockElement.style.display = "block";
-                    } else if (qtd > 5) {
-                        stockElement.style.display = "none";
                     } else {
-                        // Lógica para estoque 0: esconde mensagem e altera botão se necessário
-                        stockElement.style.display = "none";
-                        
-                        if (buyButton && buyButton.classList.contains('add-to-cart')) {
-                            // Para páginas normais: altera para WhatsApp se esgotado
-                            const whatsappMessage = encodeURIComponent(`Olá! Gostaria de comprar o produto: ${card.dataset.name}`);
-                            const whatsappNumber = '553599879068';
-                            buyButton.outerHTML = `
-                                <a href="https://wa.me/${whatsappNumber}?text=${whatsappMessage}" 
-                                   class="whatsapp-buy-btn" target="_blank">
-                                    Comprar pelo WhatsApp
-                                </a>
-                            `;
-                        }
+                        stockElement.textContent = `Esgotado`;
+                        stockElement.style.display = "block";
                     }
                 }
 
+                // REMOVIDO: Não desabilita mais o botão add-to-cart, mesmo se estoque <=0
+                // O botão permanece sempre habilitado
+
             } else {
                 console.warn(`Produto ID ${idChave} não encontrado no cache do Bling. Mantendo dados estáticos.`);
-                // Opcional: Se não encontrar, você pode desabilitar o botão de compra
+                // Fallback: Define preço como "Consultar" e NÃO desabilita add-to-cart
+                const priceElement = card.querySelector('.product-price') || card.querySelector('.price') || card.querySelector('strong');
+                if (priceElement) {
+                    priceElement.textContent = 'Consultar';
+                }
+                // REMOVIDO: Não desabilita o botão add-to-cart no fallback
             }
 
         } catch (error) {
