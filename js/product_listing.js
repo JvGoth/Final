@@ -1,28 +1,26 @@
-// Arquivo: js/product_listing.js
+// Arquivo: js/product_listing.js - Versão Final com Debug
 
 const LIST_ALL_URL = '/.netlify/functions/list_all_products';
 const DEFAULT_IMAGE = 'imagens/default.jpg';
 
 /**
- * Função ATUALIZADA para criar o card completo, mostrando sempre preço e estoque.
+ * Cria o HTML do card.
  */
 function createProductCardHTML(id, produto) {
     const imageUrl = produto.imagemUrl || DEFAULT_IMAGE;
     
-    // --- Lógica de Preço (MODIFICADA) ---
+    // Lógica de Preço (AGORA SEMPRE FORMATA)
     const preco = produto.preco || 0;
-    // REMOVIDA A CONDIÇÃO (preco > 0). Agora sempre formata o preço.
     const precoFormatado = new Intl.NumberFormat('pt-BR', { 
         style: 'currency', 
         currency: 'BRL' 
     }).format(preco);
 
-    // --- Lógica de Estoque (MODIFICADA) ---
+    // Lógica de Estoque
     const estoque = produto.estoque || 0;
     let stockHTML = '';
     
     if (estoque > 5) {
-        // MUDANÇA: Agora exibe o estoque alto em vez de esconder
         stockHTML = `<p class="stock-info" data-stock-status style="display: block; color: #4CAF50;">Em estoque (${estoque})</p>`;
     } else if (estoque > 0 && estoque <= 5) {
         stockHTML = `<p class="stock-info" data-stock-status style="display: block;">⚠ Restam apenas ${estoque} unidades!</p>`;
@@ -44,7 +42,8 @@ function createProductCardHTML(id, produto) {
             <div class="product-buttons">
                 <button class="add-to-cart" 
                         data-name="${produto.nome}" 
-                        data-price="${preco}"> Adicionar ao Carrinho
+                        data-price="${preco}">
+                    Adicionar ao Carrinho
                 </button>
                 <a href="https://wa.me/${whatsappNumber}?text=${whatsappMessage}" 
                    class="whatsapp-buy-btn" target="_blank">
@@ -55,6 +54,9 @@ function createProductCardHTML(id, produto) {
     `;
 }
 
+/**
+ * Função principal para carregar os produtos.
+ */
 async function loadProductsFromBling() {
     const productListContainer = document.querySelector('.product-list');
     if (!productListContainer) {
@@ -66,10 +68,22 @@ async function loadProductsFromBling() {
 
     try {
         const response = await fetch(LIST_ALL_URL);
+        
+        // --- LOG DE DEBUG CRÍTICO 1 ---
+        console.log('Status da requisição de produtos:', response.status); 
+
         if (!response.ok) {
-            throw new Error(`Erro HTTP: ${response.status} - ${await response.text()}`);
+            const errorText = await response.text();
+            console.error(`Erro na função Netlify (list_all_products): Status ${response.status}. Detalhes: ${errorText}`);
+            productListContainer.innerHTML = '<h2>Erro ao carregar produtos. Verifique o console (F12) para detalhes do servidor.</h2>';
+            return;
         }
+        
         const data = await response.json();
+        
+        // --- LOG DE DEBUG CRÍTICO 2 ---
+        console.log('Dados de produtos recebidos (JSON COMPLETO):', data); 
+
         productListContainer.innerHTML = ''; 
 
         if (data.error) {
@@ -80,14 +94,23 @@ async function loadProductsFromBling() {
         let htmlContent = '';
         let count = 0;
         for (const id in data) {
+            // Log de Preço Individual
+            if (data[id].preco === undefined || data[id].preco === null) {
+                console.warn(`Produto ${data[id].nome} (ID ${id}) não tem o campo 'preco' no JSON.`);
+            } else {
+                // --- LOG DE DEBUG CRÍTICO 3 ---
+                console.log(`Preço de ${data[id].nome} (ID ${id}): ${data[id].preco}`);
+            }
+            
+            // Lógica de filtro para canecas.html
             const nomeLower = data[id].nome.toLowerCase();
-            // Filtro para canecas.html
             if (window.location.pathname.includes('canecas.html') &&
                 !(nomeLower.includes('caneca') ||
                     nomeLower.includes('garrafa') ||
                     nomeLower.includes('copo'))) {
                 continue;
             }
+
             htmlContent += createProductCardHTML(id, data[id]);
             count++;
         }
@@ -95,8 +118,8 @@ async function loadProductsFromBling() {
         productListContainer.innerHTML = htmlContent || '<h2>Nenhum produto disponível no momento.</h2>';
         
     } catch (error) {
-        console.error("Erro na listagem de produtos:", error);
-        productListContainer.innerHTML = '<h2>Não foi possível conectar ao banco de dados: ' + error.message + '</h2>';
+        console.error("Erro na listagem de produtos (Geral):", error);
+        productListContainer.innerHTML = '<h2>Não foi possível conectar ao servidor. Verifique sua conexão ou a função Netlify.</h2>';
     }
 }
 
