@@ -826,6 +826,26 @@ p {
 }
 
 /* ===========================
+   ESTILO PARA BOTÃO WHATSAPP NOS CARDS (Novo)
+=========================== */
+.whatsapp-buy-btn {
+  background-color: #25d366;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  text-decoration: none;
+  display: inline-block;
+  transition: background-color 0.3s;
+}
+
+.whatsapp-buy-btn:hover {
+  background-color: #1ebe5d;
+}
+
+/* ===========================
    FORMULÁRIOS (CANECAS / ADMIN)
 =========================== */
 form,
@@ -1071,6 +1091,3 @@ form button:hover {
   opacity: 1;
   transform: translateY(0);
 }
-
-
-
