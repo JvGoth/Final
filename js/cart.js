@@ -115,6 +115,10 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         function addToCart(product) {
+            if (!product.price || product.price <= 0) {
+                alert("Preço não disponível para este produto. Consulte via WhatsApp.");
+                return;
+            }
             const existingItem = cart.find(item => item.name === product.name);
             if (existingItem) {
                 existingItem.quantity += 1;
