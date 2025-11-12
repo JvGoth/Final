@@ -1,5 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
-    // 1. Encontra o local onde o header deve ser inserido
+// 1. Encontra o local onde o header deve ser inserido
     const headerPlaceholder = document.getElementById("header-placeholder");
     
     if (headerPlaceholder) {
@@ -21,13 +20,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 loadScript("js/search.js");
                 loadScript("js/cart.js");
                 loadScript("js/user.js");
+                loadScript("js/carrosel.js");
             })
             .catch(error => {
                 console.error("Falha ao carregar o header:", error);
                 headerPlaceholder.innerHTML = "<p style='text-align:center; color:red; padding:20px;'>Erro ao carregar o menu. Tente recarregar a página.</p>";
             });
     }
-});
 
 // Função auxiliar para carregar scripts dinamicamente
 function loadScript(src) {
@@ -36,4 +35,3 @@ function loadScript(src) {
     script.defer = true;
     document.body.appendChild(script);
 }
-
