@@ -61,6 +61,7 @@ async function loadProductsFromBling() {
     const productListContainer = document.querySelector('.product-list');
     if (!productListContainer) {
         console.error('Container .product-list não encontrado no HTML.');
+        productListContainer.innerHTML = '<h2>Erro ao carregar produtos. Verifique o console (F12) para detalhes do servidor.</h2>';
         return;
     }
 
