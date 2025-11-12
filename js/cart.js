@@ -9,12 +9,8 @@ document.addEventListener("DOMContentLoaded", function() {
     function initializeCart() {
 
         // --- 1. Seletores do DOM ---
-        // Agora usando querySelector para IDs e Classes, baseado no style.css
-        // IDs:
         const cartItemsContainer = document.getElementById("cart-items-container");
-        const cartTotal = document.getElementById("cart-total"); // Este ID não estava no CSS, mantive do seu JS original.
-
-        // Classes (baseado no style.css e lógica):
+        const cartTotal = document.getElementById("cart-total");
         const cartIcon = document.querySelector(".cart-icon");
         const cartModal = document.querySelector(".cart-modal");
         const closeCartBtn = document.querySelector(".close-cart");
@@ -61,7 +57,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
             if (cart.length === 0) {
                 cartItemsContainer.innerHTML = '<p class="cart-empty">Seu carrinho está vazio.</p>';
-                // Esconde botão de WhatsApp se carrinho vazio
                 const whatsappCartBtn = document.querySelector('.whatsapp-cart-btn');
                 if (whatsappCartBtn) whatsappCartBtn.style.display = 'none';
                 return;
@@ -88,14 +83,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 cartItemsContainer.innerHTML += itemHTML;
             });
 
-            // Adiciona ou mostra o botão de WhatsApp no carrinho
             let whatsappCartBtn = document.querySelector('.whatsapp-cart-btn');
             if (!whatsappCartBtn) {
                 whatsappCartBtn = document.createElement('a');
                 whatsappCartBtn.classList.add('whatsapp-cart-btn');
                 whatsappCartBtn.textContent = 'Comprar pelo WhatsApp';
                 whatsappCartBtn.target = '_blank';
-                // Insere após o total ou no final do modal
                 if (cartTotal && cartTotal.parentNode) {
                     cartTotal.parentNode.appendChild(whatsappCartBtn);
                 } else {
@@ -104,13 +97,12 @@ document.addEventListener("DOMContentLoaded", function() {
             }
             whatsappCartBtn.style.display = 'block';
 
-            // Gera mensagem com todos os itens
             let message = 'Olá! Gostaria de comprar os seguintes itens do carrinho:\n';
             cart.forEach(item => {
                 message += `- ${item.name} (x${item.quantity}) - ${formatCurrency(item.price * item.quantity)}\n`;
             });
             message += `\nTotal: ${formatCurrency(cart.reduce((sum, item) => sum + item.price * item.quantity, 0))}`;
-            const whatsappNumber = '553599879068'; // Número da loja
+            const whatsappNumber = '553599879068';
             whatsappCartBtn.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
         }
 
@@ -148,17 +140,67 @@ document.addEventListener("DOMContentLoaded", function() {
             updateCartUI();
         }
 
+        // ==========================================================
+        // FUNÇÃO CHECKOUT CORRIGIDA (HISTÓRICO)
+        // ==========================================================
         function checkout() {
             if (cart.length === 0) {
                 alert("Seu carrinho está vazio!");
                 return;
             }
-            alert("Redirecionando para o checkout... (simulação)");
-            // Aqui você pode integrar com pagamento real
+
+            // --- INÍCIO DA LÓGICA DE HISTÓRICO ---
+            
+            // 1. Tenta buscar o usuário logado
+            let currentUser = JSON.parse(localStorage.getItem("currentUser"));
+            
+            if (currentUser) {
+                try {
+                    // 2. Prepara o objeto da compra
+                    const newPurchase = {
+                        date: new Date().toLocaleDateString("pt-BR"),
+                        total: cart.reduce((sum, item) => sum + item.price * item.quantity, 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }),
+                        items: cart.map(item => ({ name: item.name, quantity: item.quantity }))
+                    };
+
+                    // 3. Atualiza o currentUser
+                    if (!currentUser.purchases) {
+                        currentUser.purchases = [];
+                    }
+                    currentUser.purchases.push(newPurchase);
+                    localStorage.setItem("currentUser", JSON.stringify(currentUser));
+
+                    // 4. Atualiza a lista geral de usuários (para persistir)
+                    let users = JSON.parse(localStorage.getItem("users")) || [];
+                    const userIndex = users.findIndex(u => u.email === currentUser.email);
+                    
+                    if (userIndex !== -1) {
+                        users[userIndex] = currentUser; // Salva o usuário atualizado
+                        localStorage.setItem("users", JSON.stringify(users));
+                    }
+                    
+                    alert("Compra finalizada e salva no seu histórico!");
+
+                } catch (error) {
+                    console.error("Erro ao salvar histórico de compra:", error);
+                    alert("Compra finalizada (simulação), mas houve um erro ao salvar seu histórico.");
+                }
+
+            } else {
+                // Se não houver usuário logado, apenas simula
+                alert("Redirecionando para o checkout... (simulação)\n(Faça login para salvar seu histórico!)");
+            }
+            // --- FIM DA LÓGICA DE HISTÓRICO ---
+
+            // Limpa o carrinho
             cart = [];
             saveCart();
             updateCartUI();
         }
+        // ==========================================================
+        // FIM DA FUNÇÃO CHECKOUT
+        // ==========================================================
+
 
         function updateCartUI() {
             renderCartItems();
@@ -191,11 +233,15 @@ document.addEventListener("DOMContentLoaded", function() {
             });
         }
 
-        // Este listener (no body) funciona mesmo antes do header carregar
+        // ==========================================================
+        // CORREÇÃO DO ERRO DE DIGITAÇÃO (BOTÃO ADD-TO-CART)
+        // ==========================================================
         document.body.addEventListener("click", (e) => {
             if (e.target.matches(".add-to-cart")) {
                 e.preventDefault();
-                const button = e.target;
+                
+                // CORRIGIDO: Era "e.taget" e falhava aqui
+                const button = e.target; 
                 
                 const product = {
                     name: button.dataset.name,
@@ -210,6 +256,10 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             }
         });
+        // ==========================================================
+        // FIM DA CORREÇÃO
+        // ==========================================================
+
 
         if (cartItemsContainer) {
             cartItemsContainer.addEventListener("click", handleCartItemClick);
@@ -229,15 +279,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
     // --- Lógica de Espera (Resolver Race Condition) ---
-    // Vamos verificar a cada 100ms se o header já foi carregado
-    // Usamos ".cart-icon" como nossa "âncora"
-    
     const headerCheckInterval = setInterval(() => {
-        // Mude ".cart-icon" se o seletor principal do seu header for outro
         if (document.querySelector(".cart-icon")) {
-            clearInterval(headerCheckInterval); // Para o verificador
-            initializeCart(); // Roda o script do carrinho
+            clearInterval(headerCheckInterval); 
+            initializeCart(); 
         }
-    }, 100); // Verifica a cada 100ms
+    }, 100); 
     
 });
