@@ -7,9 +7,9 @@ exports.handler = async () => {
     try {
         const state = crypto.randomBytes(16).toString('hex');
         const store = getStore({
-            name: "bling_tokens",
+            name: "seu_name",
             siteID: process.env.NETLIFY_SITE_ID,
-            token: process.env.NETLIFY_API_TOKEN
+            token: process.env.NETLIFY_AUTH_TOKEN
         });
         await store.set("state", state);
 
