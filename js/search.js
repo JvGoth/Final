@@ -61,14 +61,13 @@ function filterProducts(query) {
     const normalizedQuery = currentQuery ? currentQuery.toLowerCase().trim() : '';
     let found = false;
 
-    // 2.1. Filtragem de Produtos
+    // 2.1. Filtragem de Produtos (agora apenas pelo NOME)
     productCards.forEach(card => {
         // Garante que o elemento exista antes de tentar pegar o conteúdo
         const name = card.querySelector('h3') ? card.querySelector('h3').textContent.toLowerCase() : '';
-        const description = card.querySelector('p:not(.stock)') ? card.querySelector('p:not(.stock)').textContent.toLowerCase() : '';
 
-        // Se a query estiver vazia (mostra tudo) ou se houver correspondência
-        if (!normalizedQuery || name.includes(normalizedQuery) || description.includes(normalizedQuery)) {
+        // Se a query estiver vazia (mostra tudo) ou se houver correspondência apenas no NOME
+        if (!normalizedQuery || name.includes(normalizedQuery)) {
             card.style.display = 'flex'; // Garante o display correto conforme seu CSS
             if (normalizedQuery) found = true; // Só marca como encontrado se houver query
         } else {
