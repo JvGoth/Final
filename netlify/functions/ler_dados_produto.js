@@ -10,9 +10,9 @@ exports.handler = async (event) => {
 
     try {
         const store = getStore({
-            name: "produtos_bling",
+            name: "seu_name",
             siteID: process.env.NETLIFY_SITE_ID,
-            token: process.env.NETLIFY_API_TOKEN
+            token: process.env.NETLIFY_AUTH_TOKEN
         });
         const produtoDados = await store.get(idChave, { type: "json" });
 
