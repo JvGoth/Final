@@ -44,39 +44,38 @@ async function atualizarDadosDosProdutos() {
                     }
                 }
 
-                // 3. ATUALIZA O ESTOQUE - Ignora lógica de esgotado em canecas.html
-                if (!isCanecasPage) {
-                    // Lógica padrão para outras páginas
-                    let stockElement = card.querySelector('.stock') || card.querySelector('.estoque-info');
-                    if (!stockElement) {
-                        stockElement = document.createElement('p');
-                        stockElement.classList.add('stock');
-                        card.appendChild(stockElement); // Adiciona ao final do card
-                    }
+                // 3. ATUALIZA O ESTOQUE
+                let stockElement = card.querySelector('.stock') || card.querySelector('.estoque-info');
+                if (!stockElement) {
+                    stockElement = document.createElement('p');
+                    stockElement.classList.add('stock');
+                    card.appendChild(stockElement); // Adiciona ao final do card
+                }
 
-                    if (stockElement) {
-                        const qtd = dadosProduto.estoque;
+                const qtd = dadosProduto.estoque || 0;
+                const buyButton = card.querySelector('.add-to-cart') || card.querySelector('.whatsapp-buy-btn');
 
-                        if (qtd > 0 && qtd <= 5) {
-                            stockElement.textContent = `⚠ Restam apenas ${qtd} unidades!`;
-                            stockElement.style.display = "block";
-                        } else if (qtd > 5) {
-                            stockElement.style.display = "none";
-                        } else {
-                            stockElement.textContent = `Produto Esgotado!`;
-                            stockElement.style.display = "block";
-                            const buyButton = card.querySelector('.add-to-cart');
-                            if (buyButton) {
-                                buyButton.textContent = 'Esgotado';
-                                buyButton.disabled = true;
-                            }
-                        }
-                    }
-                } else {
-                    // Em canecas.html, esconde qualquer mensagem de estoque e mantém o botão ativo (já mudado para WhatsApp)
-                    const stockElement = card.querySelector('.stock') || card.querySelector('.estoque-info');
-                    if (stockElement) {
+                if (stockElement) {
+                    if (qtd > 0 && qtd <= 5) {
+                        stockElement.textContent = `⚠ Restam apenas ${qtd} unidades!`;
+                        stockElement.style.display = "block";
+                    } else if (qtd > 5) {
                         stockElement.style.display = "none";
+                    } else {
+                        // Lógica para estoque 0: esconde mensagem e altera botão se necessário
+                        stockElement.style.display = "none";
+                        
+                        if (buyButton && buyButton.classList.contains('add-to-cart')) {
+                            // Para páginas normais: altera para WhatsApp se esgotado
+                            const whatsappMessage = encodeURIComponent(`Olá! Gostaria de comprar o produto: ${card.dataset.name}`);
+                            const whatsappNumber = '553599879068';
+                            buyButton.outerHTML = `
+                                <a href="https://wa.me/${whatsappNumber}?text=${whatsappMessage}" 
+                                   class="whatsapp-buy-btn" target="_blank">
+                                    Comprar pelo WhatsApp
+                                </a>
+                            `;
+                        }
                     }
                 }
 
