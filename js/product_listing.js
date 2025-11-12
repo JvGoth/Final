@@ -75,7 +75,6 @@ async function loadProductsFromBling() {
         if (!response.ok) {
             const errorText = await response.text();
             console.error(`Erro na função Netlify (list_all_products): Status ${response.status}. Detalhes: ${errorText}`);
-            productListContainer.innerHTML = '<h2>Erro ao carregar produtos. Verifique o console (F12) para detalhes do servidor.</h2>';
             return;
         }
         
@@ -124,3 +123,4 @@ async function loadProductsFromBling() {
 }
 
 document.addEventListener('DOMContentLoaded', loadProductsFromBling);
+
