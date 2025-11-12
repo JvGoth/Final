@@ -18,7 +18,11 @@ exports.handler = async (event) => {
     const errorDescription = params.error_description;
     const receivedState = params.state;
 
-    const store = getStore({ name: "bling_tokens" });
+    const store = getStore({
+        name: "bling_tokens",
+        siteID: process.env.NETLIFY_SITE_ID,
+        token: process.env.NETLIFY_API_TOKEN
+    });
     const storedState = await store.get("state");
 
     if (error) {
