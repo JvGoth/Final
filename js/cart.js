@@ -107,6 +107,8 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         function addToCart(product) {
+            // Esta função JÁ ESTAVA CORRETA.
+            // Ela sabe lidar com preço 0 e mostrar o alerta.
             if (!product.price || product.price <= 0) {
                 alert("Preço não disponível para este produto. Consulte via WhatsApp.");
                 return;
@@ -139,43 +141,34 @@ document.addEventListener("DOMContentLoaded", function() {
             saveCart();
             updateCartUI();
         }
-
-        // ==========================================================
-        // FUNÇÃO CHECKOUT CORRIGIDA (HISTÓRICO)
-        // ==========================================================
+        
         function checkout() {
             if (cart.length === 0) {
                 alert("Seu carrinho está vazio!");
                 return;
             }
 
-            // --- INÍCIO DA LÓGICA DE HISTÓRICO ---
-            
-            // 1. Tenta buscar o usuário logado
             let currentUser = JSON.parse(localStorage.getItem("currentUser"));
             
             if (currentUser) {
                 try {
-                    // 2. Prepara o objeto da compra
                     const newPurchase = {
                         date: new Date().toLocaleDateString("pt-BR"),
                         total: cart.reduce((sum, item) => sum + item.price * item.quantity, 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }),
                         items: cart.map(item => ({ name: item.name, quantity: item.quantity }))
                     };
 
-                    // 3. Atualiza o currentUser
                     if (!currentUser.purchases) {
                         currentUser.purchases = [];
                     }
                     currentUser.purchases.push(newPurchase);
                     localStorage.setItem("currentUser", JSON.stringify(currentUser));
 
-                    // 4. Atualiza a lista geral de usuários (para persistir)
                     let users = JSON.parse(localStorage.getItem("users")) || [];
                     const userIndex = users.findIndex(u => u.email === currentUser.email);
                     
                     if (userIndex !== -1) {
-                        users[userIndex] = currentUser; // Salva o usuário atualizado
+                        users[userIndex] = currentUser; 
                         localStorage.setItem("users", JSON.stringify(users));
                     }
                     
@@ -187,19 +180,13 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
 
             } else {
-                // Se não houver usuário logado, apenas simula
                 alert("Redirecionando para o checkout... (simulação)\n(Faça login para salvar seu histórico!)");
             }
-            // --- FIM DA LÓGICA DE HISTÓRICO ---
 
-            // Limpa o carrinho
             cart = [];
             saveCart();
             updateCartUI();
         }
-        // ==========================================================
-        // FIM DA FUNÇÃO CHECKOUT
-        // ==========================================================
 
 
         function updateCartUI() {
@@ -234,25 +221,28 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         // ==========================================================
-        // CORREÇÃO DO ERRO DE DIGITAÇÃO (BOTÃO ADD-TO-CART)
+        // CORREÇÃO DO BUG (BOTÃO ADD-TO-CART)
         // ==========================================================
         document.body.addEventListener("click", (e) => {
             if (e.target.matches(".add-to-cart")) {
                 e.preventDefault();
                 
-                // CORRIGIDO: Era "e.taget" e falhava aqui
                 const button = e.target; 
                 
                 const product = {
                     name: button.dataset.name,
-                    price: parseFloat(button.dataset.price),
+                    price: parseFloat(button.dataset.price), // Se data-price="0", price será 0
                     image: button.dataset.image || button.closest('.product-card, .carousel-item')?.querySelector('img')?.src
                 };
 
-                if (product.name && product.price) {
+                // ### ESTA É A LINHA CORRIGIDA ###
+                // Agora verificamos se o nome existe e se o preço NÃO É "NaN"
+                // (Um preço 0 é um número válido e vai passar)
+                if (product.name && !isNaN(product.price)) {
                     addToCart(product);
                 } else {
-                    console.error("Botão .add-to-cart sem data-name ou data-price.");
+                    // Este erro agora só aparecerá se data-name ou data-price estiverem faltando no HTML
+                    console.error("Botão .add-to-cart sem data-name ou data-price válido.");
                 }
             }
         });
