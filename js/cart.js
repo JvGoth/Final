@@ -61,6 +61,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
             if (cart.length === 0) {
                 cartItemsContainer.innerHTML = '<p class="cart-empty">Seu carrinho está vazio.</p>';
+                // Esconde botão de WhatsApp se carrinho vazio
+                const whatsappCartBtn = document.querySelector('.whatsapp-cart-btn');
+                if (whatsappCartBtn) whatsappCartBtn.style.display = 'none';
                 return;
             }
 
@@ -71,116 +74,83 @@ document.addEventListener("DOMContentLoaded", function() {
                         <img src="${itemImage}" alt="${item.name}">
                         <div class="cart-item-info">
                             <h4>${item.name}</h4>
-                            <p>${formatCurrency(item.price)}</p>
+                            <p>${formatCurrency(item.price)} cada</p>
+                            <div class="quantity-controls">
+                                <button class="decrease">-</button>
+                                <span>${item.quantity}</span>
+                                <button class="increase">+</button>
+                            </div>
+                            <p>Subtotal: ${formatCurrency(item.price * item.quantity)}</p>
                         </div>
-                        <div class="cart-item-controls">
-                            <button class="quantity-change" data-action="decrease">-</button>
-                            <span>${item.quantity}</span>
-                            <button class="quantity-change" data-action="increase">+</button>
-                            <button class="remove-item">X</button>
-                        </div>
+                        <button class="remove-item">Remover</button>
                     </div>
                 `;
                 cartItemsContainer.innerHTML += itemHTML;
             });
+
+            // Adiciona ou mostra o botão de WhatsApp no carrinho
+            let whatsappCartBtn = document.querySelector('.whatsapp-cart-btn');
+            if (!whatsappCartBtn) {
+                whatsappCartBtn = document.createElement('a');
+                whatsappCartBtn.classList.add('whatsapp-cart-btn');
+                whatsappCartBtn.textContent = 'Comprar pelo WhatsApp';
+                whatsappCartBtn.target = '_blank';
+                // Insere após o total ou no final do modal
+                if (cartTotal && cartTotal.parentNode) {
+                    cartTotal.parentNode.appendChild(whatsappCartBtn);
+                } else {
+                    cartItemsContainer.appendChild(whatsappCartBtn);
+                }
+            }
+            whatsappCartBtn.style.display = 'block';
+
+            // Gera mensagem com todos os itens
+            let message = 'Olá! Gostaria de comprar os seguintes itens do carrinho:\n';
+            cart.forEach(item => {
+                message += `- ${item.name} (x${item.quantity}) - ${formatCurrency(item.price * item.quantity)}\n`;
+            });
+            message += `\nTotal: ${formatCurrency(cart.reduce((sum, item) => sum + item.price * item.quantity, 0))}`;
+            const whatsappNumber = '553599879068'; // Número da loja
+            whatsappCartBtn.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
         }
 
         function addToCart(product) {
-            const existingItemIndex = cart.findIndex(item => item.name === product.name);
-
-            if (existingItemIndex > -1) {
-                cart[existingItemIndex].quantity += 1;
+            const existingItem = cart.find(item => item.name === product.name);
+            if (existingItem) {
+                existingItem.quantity += 1;
             } else {
                 cart.push({ ...product, quantity: 1 });
             }
-
             saveCart();
             updateCartUI();
-            showAddedConfirmation(product.name);
-        }
-
-        function showAddedConfirmation(productName) {
-            if (cartIcon) {
-                // 'shake' é uma animação opcional, você precisaria adicioná-la ao CSS
-                cartIcon.classList.add('shake'); 
-                console.log(`${productName} adicionado ao carrinho!`);
-                setTimeout(() => {
-                    cartIcon.classList.remove('shake');
-                }, 500);
-            }
+            alert(`${product.name} adicionado ao carrinho!`);
         }
 
         function handleCartItemClick(e) {
-            const target = e.target;
-            const cartItem = target.closest(".cart-item");
-            
-            if (!cartItem) return;
-            
-            const index = parseInt(cartItem.dataset.index);
+            const itemElement = e.target.closest('.cart-item');
+            if (!itemElement) return;
 
-            if (target.classList.contains("remove-item")) {
+            const index = parseInt(itemElement.dataset.index);
+
+            if (e.target.matches('.increase')) {
+                cart[index].quantity += 1;
+            } else if (e.target.matches('.decrease') && cart[index].quantity > 1) {
+                cart[index].quantity -= 1;
+            } else if (e.target.matches('.remove-item')) {
                 cart.splice(index, 1);
             }
 
-            if (target.classList.contains("quantity-change")) {
-                const action = target.dataset.action;
-                if (action === "increase") {
-                    cart[index].quantity += 1;
-                } else if (action === "decrease") {
-                    if (cart[index].quantity > 1) {
-                        cart[index].quantity -= 1;
-                    } else {
-                        cart.splice(index, 1);
-                    }
-                }
-            }
-            
             saveCart();
             updateCartUI();
         }
-        
+
         function checkout() {
             if (cart.length === 0) {
                 alert("Seu carrinho está vazio!");
                 return;
             }
-
-            const numeroWhatsApp = "553599879068";
-            let mensagem = "Olá, Miau Presentes! 👋\n\nGostaria de fazer o seguinte pedido:\n\n";
-
-            cart.forEach(item => {
-                mensagem += `*Produto:* ${item.name}\n`;
-                mensagem += `*Qtd:* ${item.quantity}\n`;
-                mensagem += `*Preço:* ${formatCurrency(item.price * item.quantity)}\n`;
-                mensagem += "--------------------\n";
-            });
-
-            if (cartTotal) {
-                 mensagem += `\n*Total do Pedido: ${cartTotal.textContent}*`;
-            }
-
-            const linkWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensagem)}`;
-            window.open(linkWhatsApp, "_blank");
-
-            // Salvar compra no histórico se usuário logado
-            const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-            if (currentUser) {
-                const users = JSON.parse(localStorage.getItem("users")) || [];
-                const userIndex = users.findIndex(u => u.email === currentUser.email);
-            if (userIndex > -1) {
-                const purchase = {
-                date: new Date().toLocaleString("pt-BR"),
-                items: cart,
-                total: cartTotal.textContent
-            };
-            users[userIndex].purchases.push(purchase);
-            localStorage.setItem("users", JSON.stringify(users));
-            currentUser.purchases = users[userIndex].purchases;
-            localStorage.setItem("currentUser", JSON.stringify(currentUser));
-                }
-            }
-
-            // Limpar carrinho após checkout
+            alert("Redirecionando para o checkout... (simulação)");
+            // Aqui você pode integrar com pagamento real
             cart = [];
             saveCart();
             updateCartUI();
@@ -191,9 +161,7 @@ document.addEventListener("DOMContentLoaded", function() {
             updateCartSummary();
         }
 
-        // --- 4. Event Listeners ---
-        // Todos os listeners agora são verificados para ver se o elemento existe
-
+        // --- 4. Listeners de Eventos ---
         if (cartIcon) {
             cartIcon.addEventListener("click", () => {
                 if (cartModal) cartModal.style.display = "flex";
