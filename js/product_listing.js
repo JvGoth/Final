@@ -5,9 +5,9 @@ const DEFAULT_IMAGE = 'imagens/default.jpg';
 
 function createProductCardHTML(id, produto) {
     const imageUrl = produto.imagemUrl || DEFAULT_IMAGE;
-    const precoFormatado = produto.preco ? 
+    const precoFormatado = (produto.preco && produto.preco > 0) ? 
                            new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(produto.preco) : 
-                           'R$ --,--';
+                           'Consultar';
     
     const whatsappMessage = encodeURIComponent(`Olá! Gostaria de comprar o produto: ${produto.nome}`);
     const whatsappNumber = '553599879068'; // Número do WhatsApp da loja
