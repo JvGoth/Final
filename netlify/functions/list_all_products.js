@@ -4,10 +4,14 @@ const { getStore } = require("@netlify/blobs");
 
 exports.handler = async () => {
     try {
-        const store = getStore({ name: "produtos_bling" });
+        const store = getStore({
+            name: "produtos_bling",
+            siteID: process.env.NETLIFY_SITE_ID,
+            token: process.env.NETLIFY_API_TOKEN
+        });
         const listResult = await store.list();
         
-        const keys = listResult.blobs ? listResult.blobs.map(blob => blob.key) : []; // CORRIGIDO: blobs em vez de keys
+        const keys = listResult.blobs ? listResult.blobs.map(blob => blob.key) : [];
 
         const products = {};
         for (const key of keys) {
