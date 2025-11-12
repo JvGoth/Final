@@ -4,30 +4,34 @@ const LIST_ALL_URL = '/.netlify/functions/list_all_products';
 const DEFAULT_IMAGE = 'imagens/default.jpg';
 
 /**
- * Função ATUALIZADA para criar o card completo, incluindo o status do estoque.
+ * Função ATUALIZADA para criar o card completo, mostrando sempre preço e estoque.
  */
 function createProductCardHTML(id, produto) {
     const imageUrl = produto.imagemUrl || DEFAULT_IMAGE;
     
-    // Lógica de Preço (Correta)
+    // --- Lógica de Preço (MODIFICADA) ---
     const preco = produto.preco || 0;
-    const precoFormatado = (preco > 0) ?
-        new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(preco) :
-        'Consultar';
+    // REMOVIDA A CONDIÇÃO (preco > 0). Agora sempre formata o preço.
+    const precoFormatado = new Intl.NumberFormat('pt-BR', { 
+        style: 'currency', 
+        currency: 'BRL' 
+    }).format(preco);
 
-    // Lógica de Estoque (Nova)
+    // --- Lógica de Estoque (MODIFICADA) ---
     const estoque = produto.estoque || 0;
     let stockHTML = '';
-    if (estoque > 0 && estoque <= 5) {
+    
+    if (estoque > 5) {
+        // MUDANÇA: Agora exibe o estoque alto em vez de esconder
+        stockHTML = `<p class="stock-info" data-stock-status style="display: block; color: #4CAF50;">Em estoque (${estoque})</p>`;
+    } else if (estoque > 0 && estoque <= 5) {
         stockHTML = `<p class="stock-info" data-stock-status style="display: block;">⚠ Restam apenas ${estoque} unidades!</p>`;
     } else if (estoque <= 0) {
         stockHTML = `<p class="stock-info" data-stock-status style="display: block;">Esgotado</p>`;
-    } else {
-        stockHTML = `<p class="stock-info" data-stock-status style="display: none;"></p>`;
     }
 
     const whatsappMessage = encodeURIComponent(`Olá! Gostaria de comprar o produto: ${produto.nome}`);
-    const whatsappNumber = '553599879068'; // Número do WhatsApp da loja
+    const whatsappNumber = '553599879068'; 
 
     return `
         <div class="product-card fade-in" data-id="${id}" data-name="${produto.nome}">
@@ -62,14 +66,11 @@ async function loadProductsFromBling() {
 
     try {
         const response = await fetch(LIST_ALL_URL);
-        console.log('Resposta do fetch:', response.status, response.statusText);
         if (!response.ok) {
             throw new Error(`Erro HTTP: ${response.status} - ${await response.text()}`);
         }
         const data = await response.json();
-        console.log('Dados recebidos completos:', data);
-
-        productListContainer.innerHTML = '';
+        productListContainer.innerHTML = ''; 
 
         if (data.error) {
             productListContainer.innerHTML = '<h2>Erro ao carregar produtos: ' + data.error + '</h2>';
@@ -85,17 +86,13 @@ async function loadProductsFromBling() {
                 !(nomeLower.includes('caneca') ||
                     nomeLower.includes('garrafa') ||
                     nomeLower.includes('copo'))) {
-                console.log('Produto pulado pelo filtro:', nomeLower);
                 continue;
             }
             htmlContent += createProductCardHTML(id, data[id]);
             count++;
         }
-        console.log(`Gerados ${count} cards de produtos.`);
-
+        
         productListContainer.innerHTML = htmlContent || '<h2>Nenhum produto disponível no momento.</h2>';
-
-        // REMOVIDO: O 'estoque.js' (atualizarDadosDosProdutos) não é mais chamado aqui.
         
     } catch (error) {
         console.error("Erro na listagem de produtos:", error);
