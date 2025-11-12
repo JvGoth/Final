@@ -6,7 +6,11 @@ const { getStore } = require("@netlify/blobs");
 exports.handler = async () => {
     try {
         const state = crypto.randomBytes(16).toString('hex');
-        const store = getStore({ name: "bling_tokens" });
+        const store = getStore({
+            name: "bling_tokens",
+            siteID: process.env.NETLIFY_SITE_ID,
+            token: process.env.NETLIFY_API_TOKEN
+        });
         await store.set("state", state);
 
         const CLIENT_ID = process.env.BLING_CLIENT_ID;
