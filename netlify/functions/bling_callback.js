@@ -19,7 +19,7 @@ exports.handler = async (event) => {
     const receivedState = params.state;
 
     const store = getStore({
-        name: "seu_name",
+        name: "bling_tokens",
         siteID: process.env.NETLIFY_SITE_ID,
         token: process.env.NETLIFY_AUTH_TOKEN
     });
